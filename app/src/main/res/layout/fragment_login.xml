@@ -7,7 +7,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".LoginFragment">
+    tools:context="fragment.LoginFragment">
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/loginEmailText"
