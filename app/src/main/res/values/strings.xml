@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">AndroidChatApp</string>
+    <string name="login_EmailHint">이메일</string>
+    <string name="login_PasswordHint">비밀번호</string>
+    <string name="login_loginbutton">로그인</string>
+    <string name="login_SignUp">회원가입</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
