@@ -1,12 +1,9 @@
 package com.example.androidchatapp.models
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.navigation.fragment.NavHostFragment
-import androidx.navigation.fragment.NavHostFragment.findNavController
-import com.example.androidchatapp.R
 
 class LoginViewModel : ViewModel() {
     private lateinit var _navHostFragment: NavHostFragment
@@ -20,11 +17,18 @@ class LoginViewModel : ViewModel() {
     private val _passwordConfirm = MutableLiveData<String>()
     val passwordConfirm: LiveData<String> = _passwordConfirm
 
-    private val  _employeeNumber = MutableLiveData<Int>()
+    private val _employeeNumber = MutableLiveData<Int>()
     val employeeNumber: LiveData<Int> = _employeeNumber
 
     fun cancel() {
 
+    }
+
+    fun init() {
+        _email.value = ""
+        _password.value = ""
+        _passwordConfirm.value = ""
+        _employeeNumber.value = 0
     }
 
 

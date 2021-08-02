@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     >
@@ -42,7 +43,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:singleLine="true"
-                    android:text="@{loginViewModel.email}" />
+                    android:text="@{String.valueOf(loginViewModel.email)}" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
@@ -61,7 +62,7 @@
                     android:layout_height="wrap_content"
                     android:inputType="textPassword"
                     android:singleLine="true"
-                    android:text="@{loginViewModel.password}" />
+                    android:text="@{String.valueOf(loginViewModel.password)}" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <Button

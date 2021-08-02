@@ -7,15 +7,27 @@
     <fragment
         android:id="@+id/loginFragment"
         android:name="com.example.androidchatapp.fragment.LoginFragment"
-        android:label="fragment_login"
-        tools:layout="@layout/fragment_login" >
+        android:label="@string/login_Frgament_lable"
+        tools:layout="@layout/fragment_login">
         <action
             android:id="@+id/action_loginFragment_to_signUpFragment"
             app:destination="@id/signUpFragment" />
+        <action
+            android:id="@+id/action_loginFragment_to_tabActivity"
+            app:destination="@id/tabActivity" />
     </fragment>
     <fragment
         android:id="@+id/signUpFragment"
         android:name="com.example.androidchatapp.fragment.SignUpFragment"
-        android:label="fragment_sign_up"
-        tools:layout="@layout/fragment_sign_up" />
+        android:label="@string/signup_Fragment_lable"
+        tools:layout="@layout/fragment_sign_up" >
+        <action
+            android:id="@+id/action_signUpFragment_to_loginFragment"
+            app:destination="@id/loginFragment" />
+    </fragment>
+    <activity
+        android:id="@+id/tabActivity"
+        android:name="com.example.androidchatapp.TabActivity"
+        android:label="activity_tab"
+        tools:layout="@layout/activity_tab" />
 </navigation>

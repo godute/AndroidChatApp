@@ -41,8 +41,14 @@ class LoginFragment : Fragment() {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        viewModel.init()
+    }
+
     fun signIn() {
         Log.d("LoginViewModel", "Email: ${viewModel.email}, password: ${viewModel.password}")
+        findNavController().navigate(R.id.action_loginFragment_to_tabActivity)
     }
 
     fun signUp() {

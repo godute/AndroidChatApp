@@ -12,4 +12,6 @@
     <string name="signup_id">사번</string>
     <string name="signup_ok">회원가입</string>
     <string name="signup_cancel">취소</string>
+    <string name="login_Frgament_lable">로그인</string>
+    <string name="signup_Fragment_lable">회원가입</string>
 </resources>
