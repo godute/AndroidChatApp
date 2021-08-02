@@ -1,6 +1,7 @@
 package com.example.androidchatapp.fragment
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,9 +11,15 @@ import androidx.navigation.fragment.findNavController
 import com.example.androidchatapp.R
 import com.example.androidchatapp.databinding.FragmentSignUpBinding
 import com.example.androidchatapp.models.LoginViewModel
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
+
+private const val TAG = "LoginViewModel"
 
 class SignUpFragment : Fragment() {
     private val viewModel: LoginViewModel by activityViewModels()
+    private lateinit var auth: FirebaseAuth
 
     private var _binding: FragmentSignUpBinding? = null
     private val binding get() = _binding!!
@@ -37,15 +44,29 @@ class SignUpFragment : Fragment() {
             lifecycleOwner = viewLifecycleOwner
             signUpFragment = this@SignUpFragment
         }
+        auth = Firebase.auth
     }
-
+/*
     fun signUp() {
-        findNavController().navigate(R.id.action_signUpFragment_to_loginFragment)
-    }
+    }*/
 
     fun cancel() {
         findNavController().navigate(R.id.action_signUpFragment_to_loginFragment)
     }
+
+    fun signUp() {
+        auth.createUserWithEmailAndPassword(binding.signupEmailText.text.toString(), binding.signupPasswordText.text.toString())
+            .addOnCompleteListener(requireActivity()) {  task ->
+                if(task.isSuccessful) {
+                    Log.d(TAG, "createUserWithEmail:success")
+                    findNavController().navigate(R.id.action_signUpFragment_to_loginFragment)
+                }
+                else {
+                    Log.w(TAG, "createUserWithEmail:failure", task.exception)
+                }
+            }
+    }
+
 
 
 }

@@ -28,7 +28,7 @@
             tools:context="fragment.LoginFragment">
 
             <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/loginEmailText"
+                android:id="@+id/loginEmail"
                 android:layout_width="0dp"
                 android:layout_height="60dp"
                 android:layout_marginStart="20dp"
@@ -40,6 +40,7 @@
                 app:layout_constraintTop_toTopOf="parent">
 
                 <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/loginEmailText"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:singleLine="true"
@@ -47,17 +48,18 @@
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/loginPasswordText"
+                android:id="@+id/loginPassword"
                 android:layout_width="0dp"
                 android:layout_height="60dp"
                 android:layout_marginTop="20dp"
                 android:hint="@string/login_PasswordHint"
                 app:endIconMode="password_toggle"
-                app:layout_constraintEnd_toEndOf="@+id/loginEmailText"
-                app:layout_constraintStart_toStartOf="@+id/loginEmailText"
-                app:layout_constraintTop_toBottomOf="@+id/loginEmailText">
+                app:layout_constraintEnd_toEndOf="@+id/loginEmail"
+                app:layout_constraintStart_toStartOf="@+id/loginEmail"
+                app:layout_constraintTop_toBottomOf="@+id/loginEmail">
 
                 <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/loginPasswordText"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:inputType="textPassword"
@@ -72,9 +74,9 @@
                 android:layout_marginTop="60dp"
                 android:onClick="@{()-> loginFragment.signIn()}"
                 android:text="@string/login_loginbutton"
-                app:layout_constraintEnd_toEndOf="@+id/loginPasswordText"
-                app:layout_constraintStart_toStartOf="@+id/loginPasswordText"
-                app:layout_constraintTop_toBottomOf="@+id/loginPasswordText" />
+                app:layout_constraintEnd_toEndOf="@+id/loginPassword"
+                app:layout_constraintStart_toStartOf="@+id/loginPassword"
+                app:layout_constraintTop_toBottomOf="@+id/loginPassword" />
 
             <Button
                 android:id="@+id/loginSignUpButton"

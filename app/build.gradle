@@ -5,6 +5,9 @@ plugins {
 
     // navigation
     id 'androidx.navigation.safeargs.kotlin'
+
+    // firebase
+    id 'com.google.gms.google-services'
 }
 
 android {
@@ -18,6 +21,7 @@ android {
         versionCode 1
         versionName "1.0"
 
+        multiDexEnabled true
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -41,6 +45,9 @@ android {
 }
 
 dependencies {
+    // minSdkVersion 20 이하 AndroidX를 사용하는 경우
+    implementation 'androidx.multidex:multidex:2.0.1'
+
     // ViewPager2
     implementation "androidx.viewpager2:viewpager2:1.0.0"
 
@@ -51,6 +58,11 @@ dependencies {
     // material design
     implementation 'com.google.android.material:material:1.3.0'
 
+    // firebase
+    implementation platform('com.google.firebase:firebase-bom:28.3.0')
+    implementation 'com.google.firebase:firebase-analytics-ktx'
+    implementation 'com.google.firebase:firebase-auth-ktx'
+
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     implementation 'androidx.core:core-ktx:1.6.0'
     implementation 'androidx.appcompat:appcompat:1.3.1'
@@ -59,6 +71,8 @@ dependencies {
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.3.1'
     implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.3.1'
+    implementation 'com.google.firebase:firebase-database:19.2.1'
+    implementation 'com.google.firebase:firebase-firestore:21.4.0'
     testImplementation 'junit:junit:4.+'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
