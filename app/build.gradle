@@ -45,6 +45,7 @@ android {
 }
 
 dependencies {
+
     // minSdkVersion 20 이하 AndroidX를 사용하는 경우
     implementation 'androidx.multidex:multidex:2.0.1'
 

@@ -1,4 +1,4 @@
-package com.example.androidchatapp
+package com.example.androidchatapp.adapters
 
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
@@ -16,9 +16,9 @@ class TabFragmentStateAdapter(fragmentActivity: FragmentActivity): FragmentState
 
     override fun createFragment(position: Int): Fragment {
         return when(position) {
-            1 -> UserListFragment()
-            2 -> ChatFragment()
-            3 -> GroupWareFragment()
+            0 -> UserListFragment()
+            1 -> ChatFragment()
+            2 -> GroupWareFragment()
             else -> MoreFragment()
         }
     }
