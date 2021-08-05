@@ -6,4 +6,5 @@
         <item name="android:textAppearance">?attr/textAppearanceBody1</item>
         <item name="android:width">@dimen/loginFragment_textInput_width</item>
     </style>
+
 </resources>

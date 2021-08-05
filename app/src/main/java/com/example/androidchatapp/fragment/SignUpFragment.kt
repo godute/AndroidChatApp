@@ -46,9 +46,6 @@ class SignUpFragment : Fragment() {
         }
         auth = Firebase.auth
     }
-/*
-    fun signUp() {
-    }*/
 
     fun cancel() {
         findNavController().navigate(R.id.action_signUpFragment_to_loginFragment)

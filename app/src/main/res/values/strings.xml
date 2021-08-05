@@ -14,4 +14,7 @@
     <string name="signup_cancel">취소</string>
     <string name="login_Frgament_lable">로그인</string>
     <string name="signup_Fragment_lable">회원가입</string>
+    <string name="profile_chat">대화</string>
+    <string name="profile_email">이메일</string>
+    <string name="profile_record">영상통화</string>
 </resources>

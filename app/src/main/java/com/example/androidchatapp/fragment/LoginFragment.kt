@@ -70,8 +70,4 @@ class LoginFragment : Fragment() {
     fun signUp() {
         findNavController().navigate(R.id.action_loginFragment_to_signUpFragment)
     }
-
-    companion object {
-
-    }
 }

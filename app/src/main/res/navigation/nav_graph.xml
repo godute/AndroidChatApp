@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph.xml"
     app:startDestination="@id/loginFragment">
+
     <fragment
         android:id="@+id/loginFragment"
         android:name="com.example.androidchatapp.fragment.LoginFragment"
@@ -12,15 +13,17 @@
         <action
             android:id="@+id/action_loginFragment_to_signUpFragment"
             app:destination="@id/signUpFragment" />
+
         <action
             android:id="@+id/action_loginFragment_to_tabActivity"
             app:destination="@id/tabActivity" />
+
     </fragment>
     <fragment
         android:id="@+id/signUpFragment"
         android:name="com.example.androidchatapp.fragment.SignUpFragment"
         android:label="@string/signup_Fragment_lable"
-        tools:layout="@layout/fragment_sign_up" >
+        tools:layout="@layout/fragment_sign_up">
         <action
             android:id="@+id/action_signUpFragment_to_loginFragment"
             app:destination="@id/loginFragment" />
@@ -28,6 +31,5 @@
     <activity
         android:id="@+id/tabActivity"
         android:name="com.example.androidchatapp.TabActivity"
-        android:label="activity_tab"
-        tools:layout="@layout/activity_tab" />
+        android:label="TabActivity" />
 </navigation>

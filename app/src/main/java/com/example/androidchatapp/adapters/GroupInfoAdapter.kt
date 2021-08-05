@@ -8,16 +8,19 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.androidchatapp.databinding.GroupItemBinding
 import com.example.androidchatapp.models.GroupInfo
 
-class GroupInfoAdapter(private val userList: List<GroupInfo>) :
+class GroupInfoAdapter(private val userList: List<GroupInfo>, private val mCallback: OnItemClick) :
     RecyclerView.Adapter<GroupInfoAdapter.GroupInfoViewHolder>() {
-    class GroupInfoViewHolder(private val binding: GroupItemBinding) :
+    class GroupInfoViewHolder(
+        private val binding: GroupItemBinding,
+        private val mCallback: OnItemClick
+    ) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(groupInfo: GroupInfo) {
             binding.groupName.text = groupInfo.category
             binding.userListRecyclerView.apply {
                 setHasFixedSize(true)
                 layoutManager = LinearLayoutManager(binding.root.context)
-                adapter = UserInfoAdapter(groupInfo.userList)
+                adapter = UserInfoAdapter(groupInfo.userList, mCallback)
                 addItemDecoration(
                     DividerItemDecoration(
                         binding.root.context,
@@ -33,7 +36,8 @@ class GroupInfoAdapter(private val userList: List<GroupInfo>) :
             GroupItemBinding.inflate(
                 LayoutInflater.from(parent.context),
                 parent, false
-            )
+            ),
+            mCallback
         )
     }
 
