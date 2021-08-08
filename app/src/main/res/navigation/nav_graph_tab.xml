@@ -42,9 +42,9 @@
         tools:layout="@layout/fragment_more" />
     <fragment
         android:id="@+id/profileFragment2"
-        android:name="com.example.androidchatapp.fragment.ProfileFragment"
+        android:name="com.example.androidchatapp.fragment.RecentlyChatFragment"
         android:label="fragment_profile"
-        tools:layout="@layout/fragment_profile" >
+        tools:layout="@layout/fragment_recently_chat" >
         <action
             android:id="@+id/action_profileFragment_to_chatFragment"
             app:destination="@id/chatFragment" />

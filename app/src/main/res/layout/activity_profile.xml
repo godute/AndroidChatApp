@@ -2,13 +2,13 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context=".fragment.ProfileFragment">
+    tools:context=".ProfileActivity">
 
     <data>
 
         <variable
-            name="profileFragment"
-            type="com.example.androidchatapp.fragment.ProfileFragment" />
+            name="profileActivity"
+            type="com.example.androidchatapp.ProfileActivity" />
     </data>
 
     <ScrollView
@@ -18,8 +18,16 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_gravity="center">
+            >
 
+            <ImageView
+                android:id="@+id/backButton"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                android:onClick="@{() -> profileActivity.onBackClick() }"
+                app:srcCompat="@drawable/ic_close" />
             <ImageView
                 android:id="@+id/profile_Img"
                 android:layout_width="wrap_content"
@@ -66,6 +74,7 @@
                         android:layout_height="80dp"
                         android:layout_gravity="center"
                         app:srcCompat="@drawable/ic_chat"
+                        android:onClick="@{() -> profileActivity.onChatClick()}"
                         app:tint="@color/black" />
 
                     <TextView

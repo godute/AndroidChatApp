@@ -5,9 +5,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentContainerView
 import com.example.androidchatapp.databinding.ActivityTabBinding
-import com.example.androidchatapp.fragment.ChatFragment
 import com.example.androidchatapp.fragment.GroupWareFragment
 import com.example.androidchatapp.fragment.MoreFragment
+import com.example.androidchatapp.fragment.RecentlyChatFragment
 import com.example.androidchatapp.fragment.UserListFragment
 import com.google.android.material.tabs.TabLayout
 
@@ -38,7 +38,7 @@ class TabActivity : AppCompatActivity() {
 
                     _fragment = when(tab!!.position) {
                         0 -> UserListFragment()
-                        1 -> ChatFragment()
+                        1 -> RecentlyChatFragment()
                         2 -> GroupWareFragment()
                         else -> MoreFragment()
                     }

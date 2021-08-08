@@ -9,6 +9,7 @@ buildscript {
         google()
         mavenCentral()
         jcenter()
+        maven { url 'https://dl.bintray.com/lisawray/maven' }
     }
     dependencies {
         // navigation

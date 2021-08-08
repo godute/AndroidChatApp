@@ -13,7 +13,7 @@ class GroupInfoAdapter(private val userList: List<GroupInfo>, private val mCallb
     class GroupInfoViewHolder(
         private val binding: GroupItemBinding,
         private val mCallback: OnItemClick
-    ) :
+        ) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(groupInfo: GroupInfo) {
             binding.groupName.text = groupInfo.category

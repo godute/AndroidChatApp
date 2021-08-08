@@ -1,5 +1,6 @@
 package com.example.androidchatapp.fragment
 
+import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
@@ -10,7 +11,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.LiveData
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.androidchatapp.R
+import com.example.androidchatapp.ProfileActivity
 import com.example.androidchatapp.adapters.GroupInfoAdapter
 import com.example.androidchatapp.adapters.OnItemClick
 import com.example.androidchatapp.databinding.FragmentUserListBinding
@@ -170,13 +171,18 @@ class UserListFragment : Fragment(), OnItemClick {
 
     override fun onProfileClick(uid: String) {
         Log.d(TAG, "onProfileClick Called $uid")
-
-        val fragment = ProfileFragment()
-        val args = Bundle()
-        args.putString("userId", uid)
-        fragment.arguments = args
-        val transaction = activity?.supportFragmentManager?.beginTransaction()
-        transaction?.replace(R.id.fragmentContainer, fragment)
-        transaction?.commit()
+//
+//        val fragment = ProfileFragment()
+//        val args = Bundle()
+//        args.putString("userId", uid)
+//        fragment.arguments = args
+//        val transaction = activity?.supportFragmentManager?.beginTransaction()
+//        transaction?.replace(R.id.fragmentContainer, fragment)
+//        transaction?.commit()
+        activity?.let{
+            val intent = Intent(it, ProfileActivity::class.java)
+            intent.putExtra("userId", uid)
+            it.startActivity(intent)
+        }
     }
 }
