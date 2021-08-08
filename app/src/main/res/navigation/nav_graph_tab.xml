@@ -19,9 +19,9 @@
     </fragment>
     <fragment
         android:id="@+id/chatFragment"
-        android:name="com.example.androidchatapp.fragment.ChatFragment"
+        android:name="com.example.androidchatapp.fragment.RecentlyChatFragment"
         android:label="fragment_chat"
-        tools:layout="@layout/fragment_chat" >
+        tools:layout="@layout/fragment_recently_chat" >
         <action
             android:id="@+id/action_chatFragment_to_groupWareFragment"
             app:destination="@id/groupWareFragment" />
