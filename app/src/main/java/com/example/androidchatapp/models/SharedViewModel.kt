@@ -21,6 +21,9 @@ class SharedViewModel: ViewModel() {
         _groupList.value = groupList
     }
 
+    fun addUser(user: UserInfo) {
+        _groupList.value?.add(GroupInfo("새 친구", listOf(user)))
+    }
     fun clearGroupList() {
         _groupList.value?.clear()
     }

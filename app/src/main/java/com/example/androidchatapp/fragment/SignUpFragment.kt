@@ -11,8 +11,10 @@ import androidx.navigation.fragment.findNavController
 import com.example.androidchatapp.R
 import com.example.androidchatapp.databinding.FragmentSignUpBinding
 import com.example.androidchatapp.models.LoginViewModel
+import com.example.androidchatapp.models.UserInfo
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.ktx.Firebase
 
 private const val TAG = "LoginViewModel"
@@ -55,7 +57,15 @@ class SignUpFragment : Fragment() {
         auth.createUserWithEmailAndPassword(binding.signupEmailText.text.toString(), binding.signupPasswordText.text.toString())
             .addOnCompleteListener(requireActivity()) {  task ->
                 if(task.isSuccessful) {
-                    Log.d(TAG, "createUserWithEmail:success")
+                    Log.d(TAG, "createUserWithEmail:success ${task.result?.user?.uid}")
+
+                    val uid = task.result?.user?.uid.toString()
+                    val profileImg = ""
+                    val name = binding.signupNameText.text.toString()
+                    val employeeNo = binding.signupEmployeeNumberText.text.toString().toInt()
+
+                    saveUserToFirebaseDatabase(uid, name, profileImg, employeeNo)
+
                     findNavController().navigate(R.id.action_signUpFragment_to_loginFragment)
                 }
                 else {
@@ -64,6 +74,17 @@ class SignUpFragment : Fragment() {
             }
     }
 
+    private fun saveUserToFirebaseDatabase(uid: String, name: String, profileImg: String, employeeNo: Int ){
+        val db = FirebaseFirestore.getInstance()
+        val user = UserInfo(uid, name, profileImg, employeeNo)
+
+        db.collection("users").document(uid)
+            .set(user)
+            .addOnSuccessListener {
+                Log.d(TAG, "Finally we saved the user to Firebase Database")
+            }
+
+    }
 
 
 }

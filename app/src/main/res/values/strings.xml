@@ -17,4 +17,6 @@
     <string name="profile_chat">대화</string>
     <string name="profile_email">이메일</string>
     <string name="profile_record">영상통화</string>
+    <string name="signup_name">이름</string>
+    <string name="users">users</string>
 </resources>

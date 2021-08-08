@@ -43,14 +43,32 @@
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/signupName"
+            android:layout_width="0dp"
+            android:layout_height="60dp"
+            android:layout_marginTop="40dp"
+            android:hint="@string/signup_name"
+            app:layout_constraintEnd_toEndOf="@id/signupEmail"
+            app:layout_constraintStart_toStartOf="@id/signupEmail"
+            app:layout_constraintTop_toBottomOf="@+id/signupEmail">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/signupNameText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@{String.valueOf(signUpViewModel.name)}"
+                android:singleLine="true" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/signupPassword"
             android:layout_width="0dp"
             android:layout_height="60dp"
             android:layout_marginTop="40dp"
             android:hint="@string/signup_password"
-            app:layout_constraintEnd_toEndOf="@+id/signupEmail"
-            app:layout_constraintStart_toStartOf="@id/signupEmail"
-            app:layout_constraintTop_toBottomOf="@+id/signupEmail">
+            app:layout_constraintEnd_toEndOf="@+id/signupName"
+            app:layout_constraintStart_toStartOf="@id/signupName"
+            app:layout_constraintTop_toBottomOf="@+id/signupName">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/signupPasswordText"
@@ -78,7 +96,7 @@
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/signupID"
+            android:id="@+id/signupEmployeeNumber"
             android:layout_width="0dp"
             android:layout_height="60dp"
             android:layout_marginTop="40dp"
@@ -88,6 +106,7 @@
             app:layout_constraintTop_toBottomOf="@+id/signupPasswordConfirm">
 
             <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/signupEmployeeNumberText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@{String.valueOf(signUpViewModel.employeeNumber)}"
@@ -102,8 +121,8 @@
             android:layout_marginTop="60dp"
             android:text="@string/signup_ok"
             android:onClick="@{() -> signUpFragment.signUp()}"
-            app:layout_constraintStart_toStartOf="@+id/signupID"
-            app:layout_constraintTop_toBottomOf="@+id/signupID" />
+            app:layout_constraintStart_toStartOf="@+id/signupEmployeeNumber"
+            app:layout_constraintTop_toBottomOf="@+id/signupEmployeeNumber" />
 
         <Button
             android:id="@+id/cancelButton"
@@ -113,8 +132,8 @@
             android:layout_marginTop="60dp"
             android:text="@string/signup_cancel"
             android:onClick="@{() -> signUpFragment.cancel()}"
-            app:layout_constraintEnd_toEndOf="@+id/signupID"
-            app:layout_constraintTop_toBottomOf="@+id/signupID" />
+            app:layout_constraintEnd_toEndOf="@+id/signupEmployeeNumber"
+            app:layout_constraintTop_toBottomOf="@+id/signupEmployeeNumber" />
     </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
 
