@@ -153,8 +153,6 @@ class UserListFragment : Fragment(), OnItemClick {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         Log.d(TAG, "onViewCreated Called, User Id: ${Firebase.auth.currentUser?.uid.toString()}")
         super.onViewCreated(view, savedInstanceState)
-
-
     }
 
     private fun setupRecyclerView() {
@@ -171,18 +169,28 @@ class UserListFragment : Fragment(), OnItemClick {
 
     override fun onProfileClick(uid: String) {
         Log.d(TAG, "onProfileClick Called $uid")
-//
-//        val fragment = ProfileFragment()
-//        val args = Bundle()
-//        args.putString("userId", uid)
-//        fragment.arguments = args
-//        val transaction = activity?.supportFragmentManager?.beginTransaction()
-//        transaction?.replace(R.id.fragmentContainer, fragment)
-//        transaction?.commit()
+
         activity?.let{
-            val intent = Intent(it, ProfileActivity::class.java)
-            intent.putExtra("userId", uid)
-            it.startActivity(intent)
+            FirebaseFirestore.getInstance()
+                .collection("users")
+                .document(uid)
+                .get()
+                .addOnSuccessListener { document ->
+                    document?.apply{
+                        Log.d(TAG, "Success get User ${get("uid").toString()}")
+
+                        val intent = Intent(it, ProfileActivity::class.java)
+
+                        intent.putExtra(ProfileActivity.USER_KEY,
+                            UserInfo(
+                                get("uid").toString(),
+                                get("name").toString(),
+                                get("profileImg").toString(),
+                                get("employeeNumber").toString().toInt()))
+
+                        it.startActivity(intent)
+                    }
+                }
         }
     }
 }

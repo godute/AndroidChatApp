@@ -5,10 +5,13 @@ import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import com.example.androidchatapp.databinding.ActivityProfileBinding
-import com.google.firebase.firestore.FirebaseFirestore
+import com.example.androidchatapp.models.UserInfo
 
 private const val TAG = "ProfileActivity"
 class ProfileActivity : AppCompatActivity() {
+    companion object {
+        val USER_KEY = "USER_KEY"
+    }
     private var _binding: ActivityProfileBinding? = null
     private val binding get() = _binding!!
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -24,26 +27,29 @@ class ProfileActivity : AppCompatActivity() {
     override fun onStart() {
         Log.d(TAG, "onStart() called")
         super.onStart()
-        val uid = intent.getStringExtra("userId").toString()
-        FirebaseFirestore.getInstance()
-            .collection("users")
-            .document(uid)
-            .get()
-            .addOnSuccessListener { document ->
-                if(document != null) {
-                    Log.d(TAG, "DocumentSnapshot data: ${document.data}")
-                    binding.profileUserName.text = document.data?.get("name").toString()
-                }
-                else {
-                    Log.d(TAG, "No such document")
-                }
-            }
+        val userInfo = intent.getParcelableExtra<UserInfo>(USER_KEY)
+
+        binding.profileUserName.text = userInfo?.name
+
+//        FirebaseFirestore.getInstance()
+//            .collection("users")
+//            .document(uid)
+//            .get()
+//            .addOnSuccessListener { document ->
+//                if(document != null) {
+//                    Log.d(TAG, "DocumentSnapshot data: ${document.data}")
+//                    binding.profileUserName.text = document.data?.get("name").toString()
+//                }
+//                else {
+//                    Log.d(TAG, "No such document")
+//                }
+//            }
     }
 
     fun onChatClick() {
         Log.d(TAG, "onChatClick() called")
         val intent = Intent(this@ProfileActivity, ChatActivity::class.java)
-        intent.putExtra("patnerId", "")
+        intent.putExtra(USER_KEY, "")
         startActivity(intent)
     }
 
