@@ -83,8 +83,5 @@ class SignUpFragment : Fragment() {
             .addOnSuccessListener {
                 Log.d(TAG, "Finally we saved the user to Firebase Database")
             }
-
     }
-
-
 }
