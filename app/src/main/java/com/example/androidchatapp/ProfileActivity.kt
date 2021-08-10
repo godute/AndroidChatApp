@@ -9,6 +9,7 @@ import com.example.androidchatapp.models.UserInfo
 
 private const val TAG = "ProfileActivity"
 class ProfileActivity : AppCompatActivity() {
+    private var user: UserInfo? = null
     companion object {
         val USER_KEY = "USER_KEY"
     }
@@ -27,9 +28,9 @@ class ProfileActivity : AppCompatActivity() {
     override fun onStart() {
         Log.d(TAG, "onStart() called")
         super.onStart()
-        val userInfo = intent.getParcelableExtra<UserInfo>(USER_KEY)
+        user = intent.getParcelableExtra<UserInfo>(USER_KEY)
 
-        binding.profileUserName.text = userInfo?.name
+        binding.profileUserName.text = user?.name
 
 //        FirebaseFirestore.getInstance()
 //            .collection("users")
@@ -49,7 +50,7 @@ class ProfileActivity : AppCompatActivity() {
     fun onChatClick() {
         Log.d(TAG, "onChatClick() called")
         val intent = Intent(this@ProfileActivity, ChatActivity::class.java)
-        intent.putExtra(USER_KEY, "")
+        intent.putExtra(USER_KEY, user)
         startActivity(intent)
     }
 
