@@ -5,6 +5,10 @@ import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.androidchatapp.databinding.ActivityChatBinding
+import com.example.androidchatapp.models.Message
+import com.example.androidchatapp.models.ReceiveMessageItem
+import com.example.androidchatapp.models.SendMessageItem
+import com.google.firebase.Timestamp
 import com.xwray.groupie.GroupieAdapter
 
 private const val TAG = "ChatActivity"
@@ -23,13 +27,9 @@ class ChatActivity : AppCompatActivity() {
 
                 val groupieAdapter = GroupieAdapter()
 
-//                groupieAdapter.add(ChatFromItem(0))
-//                groupieAdapter.add(ChatToItem(1))
-//                groupieAdapter.add(ChatFromItem(2))
-//                groupieAdapter.add(ChatToItem(3))
-//                groupieAdapter.add(ChatFromItem(4))
-//                groupieAdapter.add(ChatToItem(5))
-//                groupieAdapter.add(ChatFromItem(6))
+                groupieAdapter.add(SendMessageItem(Message("1", "2", "1", "hi wootae", Timestamp.now())))
+
+                groupieAdapter.add(ReceiveMessageItem(Message("1", "2", "1", "hi ~", Timestamp.now())))
 
                 layoutManager = LinearLayoutManager(context)
 
