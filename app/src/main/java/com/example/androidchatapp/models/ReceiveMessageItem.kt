@@ -5,9 +5,9 @@ import com.example.androidchatapp.R
 import com.example.androidchatapp.databinding.RowReceiveMessageBinding
 import com.xwray.groupie.viewbinding.BindableItem
 
-class ReceiveMessageItem(private val message: Message) : BindableItem<RowReceiveMessageBinding>() {
+class ReceiveMessageItem(private val chatMessage: ChatMessage) : BindableItem<RowReceiveMessageBinding>() {
     override fun bind(viewBinding: RowReceiveMessageBinding, position: Int) {
-        viewBinding.message = message
+        viewBinding.message = chatMessage
     }
 
     override fun getLayout(): Int = R.layout.row_receive_message

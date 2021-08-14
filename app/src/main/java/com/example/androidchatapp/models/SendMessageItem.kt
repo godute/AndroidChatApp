@@ -5,9 +5,9 @@ import com.example.androidchatapp.R
 import com.example.androidchatapp.databinding.RowSendMessageBinding
 import com.xwray.groupie.viewbinding.BindableItem
 
-class SendMessageItem(private val message: Message) : BindableItem<RowSendMessageBinding>() {
+class SendMessageItem(private val chatMessage: ChatMessage) : BindableItem<RowSendMessageBinding>() {
     override fun bind(viewBinding: RowSendMessageBinding, position: Int) {
-        viewBinding.message = message
+        viewBinding.message = chatMessage
     }
 
     override fun getLayout(): Int = R.layout.row_send_message

@@ -28,23 +28,9 @@ class ProfileActivity : AppCompatActivity() {
     override fun onStart() {
         Log.d(TAG, "onStart() called")
         super.onStart()
-        user = intent.getParcelableExtra<UserInfo>(USER_KEY)
+        user = intent.getParcelableExtra(USER_KEY)
 
         binding.profileUserName.text = user?.name
-
-//        FirebaseFirestore.getInstance()
-//            .collection("users")
-//            .document(uid)
-//            .get()
-//            .addOnSuccessListener { document ->
-//                if(document != null) {
-//                    Log.d(TAG, "DocumentSnapshot data: ${document.data}")
-//                    binding.profileUserName.text = document.data?.get("name").toString()
-//                }
-//                else {
-//                    Log.d(TAG, "No such document")
-//                }
-//            }
     }
 
     fun onChatClick() {

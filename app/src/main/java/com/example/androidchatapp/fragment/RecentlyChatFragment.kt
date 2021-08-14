@@ -9,14 +9,14 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.androidchatapp.adapters.RecentlyChatAdapter
 import com.example.androidchatapp.databinding.FragmentRecentlyChatBinding
-import com.example.androidchatapp.models.MessageList
+import com.example.androidchatapp.models.ChatMessageList
 
 private const val TAG = "RecentlyChatFragment"
 
 class RecentlyChatFragment : Fragment() {
     private var _binding: FragmentRecentlyChatBinding? = null
     private val binding get() = _binding!!
-    private lateinit var messageList: List<MessageList>
+    private lateinit var chatMessageList: List<ChatMessageList>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

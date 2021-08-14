@@ -18,7 +18,7 @@ class UserInfoAdapter(private val userList: List<UserInfo>, private val callback
             with(binding) {
                 userName.text = user.name
                 userProfile.setOnClickListener {
-                    callback.onProfileClick(user.uid)
+                    callback.onProfileClick(user.userId)
                 }
             }
         }

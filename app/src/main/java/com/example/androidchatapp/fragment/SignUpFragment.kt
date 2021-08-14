@@ -76,7 +76,7 @@ class SignUpFragment : Fragment() {
 
     private fun saveUserToFirebaseDatabase(uid: String, name: String, profileImg: String, employeeNo: Int ){
         val db = FirebaseFirestore.getInstance()
-        val user = UserInfo(uid, name, profileImg, employeeNo)
+        val user = UserInfo(uid, name, profileImg, HashMap<String,String>() ,employeeNo)
 
         db.collection("users").document(uid)
             .set(user)

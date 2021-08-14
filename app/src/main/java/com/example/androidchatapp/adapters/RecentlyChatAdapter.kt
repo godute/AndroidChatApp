@@ -3,10 +3,10 @@ package com.example.androidchatapp.adapters
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.androidchatapp.databinding.RecentlyChatItemBinding
-import com.example.androidchatapp.models.Message
+import com.example.androidchatapp.models.ChatMessage
 
 
-class RecentlyChatAdapter(val messages: List<Message>) : RecyclerView.Adapter<RecentlyChatAdapter.RecentlyChatViewHolder>() {
+class RecentlyChatAdapter(val chatMessages: List<ChatMessage>) : RecyclerView.Adapter<RecentlyChatAdapter.RecentlyChatViewHolder>() {
     class RecentlyChatViewHolder(private val binding: RecentlyChatItemBinding): RecyclerView.ViewHolder(binding.root) {
 
     }

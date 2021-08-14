@@ -6,7 +6,7 @@
     <data>
         <variable
             name="message"
-            type="com.example.androidchatapp.models.Message" />
+            type="com.example.androidchatapp.models.ChatMessage" />
     </data>
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -28,7 +28,7 @@
             android:layout_marginStart="100dp"
             android:background="@color/blue_light"
             android:padding="10dp"
-            android:text="@{message.text}"
+            android:text="@{message.content}"
             app:layout_constraintEnd_toStartOf="@+id/chat_to_imageView"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"

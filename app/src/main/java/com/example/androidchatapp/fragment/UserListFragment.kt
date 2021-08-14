@@ -22,8 +22,6 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.DocumentChange
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.ktx.Firebase
-import java.util.*
-import kotlin.collections.ArrayList
 
 private const val TAG = "UserListFragment"
 
@@ -32,6 +30,10 @@ class UserListFragment : Fragment(), OnItemClick {
 
 
 //    private var userList = ArrayList<GroupInfo>()
+
+    companion object {
+        lateinit var CurrentUser: UserInfo
+    }
 
     private var selectedPhotoUri: Uri? = null
     private var _binding: FragmentUserListBinding? = null
@@ -82,16 +84,19 @@ class UserListFragment : Fragment(), OnItemClick {
                     when (dc.type) {
                         DocumentChange.Type.ADDED -> {
                             Log.d(TAG, "New User: ${dc.document.data}")
-                            dc.document.data.apply {
-                                sharedViewModel.addUser(
-                                    UserInfo(
-                                        get("uid") as String,
-                                        get("name") as String,
-                                        get("profileImg") as String,
-                                        get("employeeNumber").toString().toInt()
-                                    )
-                                )
-                            }
+//                            dc.document.data.apply {
+//                                sharedViewModel.addUser(
+//
+//                                    UserInfo(
+//                                        get("userId") as String,
+//                                        get("name") as String,
+//                                        get("profileImg") as String,
+//                                        get("roomId") as ArrayList<String>,
+//                                        get("employeeNumber").toString().toInt()
+//                                    )
+//                                )
+//                            }
+                            sharedViewModel.addUser(dc.document.toObject(UserInfo::class.java))
                         }
                         DocumentChange.Type.MODIFIED -> Log.d(TAG, "Modified: ${dc.document.data}")
                         DocumentChange.Type.REMOVED -> Log.d(TAG, "Removed: ${dc.document.data}")
@@ -114,30 +119,34 @@ class UserListFragment : Fragment(), OnItemClick {
                     Log.d(TAG, "DocumentSize: ${snapshot.size()}")
 
                     for (dc in snapshot) {
-                        dc.data.apply {
-                            Log.d(TAG, "DocumentSnapshot data: ${dc.data}")
-                            fUsers.add(
-                                UserInfo(
-                                    get("uid") as String,
-                                    get("name") as String,
-                                    get("profileImg") as String,
-                                    get("employeeNumber").toString().toInt()
-                                )
-                            )
+                        Log.d(TAG, "DocumentSnapshot data: ${dc.data}")
+//                            fUsers.add(
+//                                UserInfo(
+//                                    get("uid") as String,
+//                                    get("name") as String,
+//                                    get("profileImg") as String,
+//                                    get("roomId") as ArrayList<String>,
+//                                    get("employeeNumber").toString().toInt()
+//                                )
+//                            )
+                        val userInfo = dc.toObject(UserInfo::class.java)
+                        fUsers.add(userInfo)
+                        if (userInfo.userId == Firebase.auth.currentUser!!.uid) {
+                            CurrentUser = userInfo
                         }
                     }
 
-                    val groupbyList = fUsers.groupBy { user->
-                        user.uid == Firebase.auth.currentUser!!.uid
+                    val groupbyList = fUsers.groupBy { user ->
+                        user.userId == Firebase.auth.currentUser!!.uid
                     }
 
-                    val sortedList = groupbyList.toSortedMap(compareBy<Boolean> {it}.thenBy { it })
+                    val sortedList =
+                        groupbyList.toSortedMap(compareBy<Boolean> { it }.thenBy { it })
 
-                    for((k, v) in sortedList) {
-                        if(k) {
+                    for ((k, v) in sortedList) {
+                        if (k) {
                             _userList.add(GroupInfo("내 프로필", v))
-                        }
-                        else {
+                        } else {
                             _userList.add(GroupInfo("친구 목록", v))
                         }
                     }
@@ -170,24 +179,29 @@ class UserListFragment : Fragment(), OnItemClick {
     override fun onProfileClick(uid: String) {
         Log.d(TAG, "onProfileClick Called $uid")
 
-        activity?.let{
+        activity?.let {
             FirebaseFirestore.getInstance()
                 .collection("users")
                 .document(uid)
                 .get()
                 .addOnSuccessListener { document ->
-                    document?.apply{
-                        Log.d(TAG, "Success get User ${get("uid").toString()}")
+                    document?.apply {
+                        Log.d(TAG, "Success get User ${get("userId").toString()}")
 
                         val intent = Intent(it, ProfileActivity::class.java)
 
-                        intent.putExtra(ProfileActivity.USER_KEY,
-                            UserInfo(
-                                get("uid").toString(),
-                                get("name").toString(),
-                                get("profileImg").toString(),
-                                get("employeeNumber").toString().toInt()))
+                        val userInfo = document.toObject(UserInfo::class.java)
+                        intent.putExtra(
+                            ProfileActivity.USER_KEY,
+//                            UserInfo(
+//                                get("uid").toString(),
+//                                get("name").toString(),
+//                                get("profileImg").toString(),
+//                                get("roomId") as ArrayList<String>,
+//                                get("employeeNumber").toString().toInt()))
 
+                            userInfo
+                        )
                         it.startActivity(intent)
                     }
                 }
