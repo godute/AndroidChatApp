@@ -7,7 +7,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.androidchatapp.ProfileActivity
 import com.example.androidchatapp.adapters.GroupInfoAdapter
@@ -23,16 +22,10 @@ import com.google.firebase.ktx.Firebase
 private const val TAG = "UserListFragment"
 
 class UserListFragment : Fragment(), OnItemClick {
-    companion object {
-        lateinit var CurrentUser: UserInfo
-    }
-
     private var _binding: FragmentUserListBinding? = null
     private val binding get() = _binding!!
 
     // 데이터 공유 ViewModel
-    private val sharedViewModel: SharedViewModel by activityViewModels()
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -43,7 +36,6 @@ class UserListFragment : Fragment(), OnItemClick {
 
         binding?.apply {
             lifecycleOwner = viewLifecycleOwner
-            viewModel = sharedViewModel
             userListFragment = this@UserListFragment
         }
 
@@ -53,7 +45,7 @@ class UserListFragment : Fragment(), OnItemClick {
     }
 
     private fun fetchUsers() {
-        sharedViewModel.initGroup()
+        SharedViewModel.initGroup()
 
         val ref = FirebaseFirestore.getInstance().collection("users")
 
@@ -72,12 +64,12 @@ class UserListFragment : Fragment(), OnItemClick {
                             val userInfo = dc.document.toObject(UserInfo::class.java)
 
                             val groupName: String = if(userInfo.userId == Firebase.auth.currentUser!!.uid) {
-                                sharedViewModel.setCurrentUser(userInfo)
+                                SharedViewModel.setCurrentUser(userInfo)
                                 "내 프로필"
                             } else {
                                 "친구목록"
                             }
-                            sharedViewModel.addUser(groupName, userInfo)
+                            SharedViewModel.addUser(groupName, userInfo)
                         }
                         DocumentChange.Type.MODIFIED -> Log.d(TAG, "Modified: ${dc.document.data}")
                         DocumentChange.Type.REMOVED -> Log.d(TAG, "Removed: ${dc.document.data}")
@@ -102,7 +94,7 @@ class UserListFragment : Fragment(), OnItemClick {
 
             layoutManager = LinearLayoutManager(requireActivity())
 
-            adapter = sharedViewModel.GroupList.value?.let { GroupInfoAdapter(it, this@UserListFragment) }
+            adapter = SharedViewModel.GroupList.value?.let { GroupInfoAdapter(it, this@UserListFragment) }
         }
     }
 

@@ -5,7 +5,6 @@ import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.androidchatapp.databinding.ActivityChatBinding
-import com.example.androidchatapp.fragment.UserListFragment.Companion.CurrentUser
 import com.example.androidchatapp.models.*
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.DocumentChange
@@ -21,6 +20,7 @@ class ChatActivity : AppCompatActivity() {
     private var _binding: ActivityChatBinding? = null
     private val binding get() = _binding!!
     val groupieAdapter = GroupieAdapter()
+
     private lateinit var _roomId: String
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -177,11 +177,11 @@ class ChatActivity : AppCompatActivity() {
                 rooms.put(user!!.userId, _roomId)
                 ref.set(
                     hashMapOf(
-                        "employeeNumber" to CurrentUser.employeeNumber,
-                        "name" to CurrentUser.name,
-                        "profileImg" to CurrentUser.profileImg,
+                        "employeeNumber" to SharedViewModel.CurrentUser.employeeNumber,
+                        "name" to SharedViewModel.CurrentUser.name,
+                        "profileImg" to SharedViewModel.CurrentUser.profileImg,
                         "roomList" to rooms,
-                        "userId" to CurrentUser.userId
+                        "userId" to SharedViewModel.CurrentUser.userId
                     )
                 )
                 putUserToRoom()
@@ -191,7 +191,7 @@ class ChatActivity : AppCompatActivity() {
 
     // room에 userList추가
     private fun roomUserUpdate() {
-        val userList = listOf(CurrentUser.userId, user?.userId)
+        val userList = listOf(SharedViewModel.CurrentUser.userId, user?.userId)
         val ref = FirebaseFirestore.getInstance().collection("rooms")
             .document(_roomId)
 
