@@ -87,20 +87,18 @@ class ChatActivity : AppCompatActivity() {
             }
 
         binding.chatSendMessageText.text.clear()
-        groupieAdapter.add(SendMessageItem(message))
-        binding.chatRecyclerView.adapter = groupieAdapter
     }
 
     private fun listenForMessages() {
-        val roomRef = FirebaseFirestore.getInstance().collection("/rooms").document(_roomId)
+        Log.d(TAG, "Room Id : $_roomId")
+        val roomRef = FirebaseFirestore.getInstance().collection("rooms").document(_roomId)
 
-        roomRef.collection("messages")
+        roomRef.collection("messages").orderBy("timestamp")
             .addSnapshotListener { snapshot, e ->
                 if (e != null) {
                     Log.d(TAG, "Listen failed", e)
                     return@addSnapshotListener
                 }
-
                 for (dc in snapshot!!.documentChanges) {
                     when (dc.type) {
                         // 메세지가 Cloud Firestore에 추가된 경우
@@ -113,11 +111,10 @@ class ChatActivity : AppCompatActivity() {
                                 groupieAdapter.add(ReceiveMessageItem(message))
                             }
 
-                            binding.chatRecyclerView.adapter = groupieAdapter
-
                         }
                     }
                 }
+                binding.chatRecyclerView.adapter = groupieAdapter
             }
     }
 
@@ -127,7 +124,7 @@ class ChatActivity : AppCompatActivity() {
         val roomRef = FirebaseFirestore.getInstance().collection("rooms")
             .document(roomId)
 
-        val messageRef = roomRef.collection("messages")
+        roomRef.collection("messages")
             .get()
             .addOnSuccessListener { snapshots ->
                 val messageList = ArrayList<ChatMessage>()
@@ -136,26 +133,9 @@ class ChatActivity : AppCompatActivity() {
                 for (docu in snapshots) {
                     messageList.add(docu.toObject(ChatMessage::class.java))
                 }
-                if (messageList.isNotEmpty()) {
-                    setRoom(ChatRoom(_roomId, ArrayList<String>(), ChatMessageList(messageList)))
-                } else {
 
-                }
+                listenForMessages()
             }
-    }
-
-    private fun setRoom(chatRoom: ChatRoom) {
-        // Room 초기세팅
-        chatRoom.chatMessageList.chatMessages.map {
-            when (it.senderId) {
-                Firebase.auth.currentUser!!.uid -> groupieAdapter.add(SendMessageItem(it))
-                else -> groupieAdapter.add(ReceiveMessageItem(it))
-            }
-        }
-
-        listenForMessages()
-
-        binding.chatRecyclerView.adapter = groupieAdapter
     }
 
     private fun findRoom() {
@@ -170,7 +150,7 @@ class ChatActivity : AppCompatActivity() {
 
             if (roomId != null) {
                 // 해당 채팅상대에 대한 room Id가 존재하면, room(대화방) 정보를 가져온다
-                getRoom(roomId)
+                    _roomId = roomId
             } else {
                 // 상대방과 대화흔적이 없으면 새로 생성한다.
                 _roomId = UUID.randomUUID().toString()
@@ -186,6 +166,8 @@ class ChatActivity : AppCompatActivity() {
                 )
                 putUserToRoom()
             }
+
+            getRoom(_roomId)
         }
     }
 

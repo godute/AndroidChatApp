@@ -8,7 +8,7 @@ private const val TAG = "SharedViewModel"
 
 object SharedViewModel {
     private var _currentUser = UserInfo()
-    val CurrentUser:UserInfo = _currentUser
+    val CurrentUser:UserInfo get() = _currentUser
 
     private val _groupList = MutableLiveData<HashMap<String, ArrayList<UserInfo>>>()
     val GroupList: LiveData<HashMap<String, ArrayList<UserInfo>>> = _groupList
