@@ -13,7 +13,6 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.ktx.Firebase
 import com.xwray.groupie.GroupieAdapter
 import java.util.*
-import kotlin.collections.HashMap
 
 private const val TAG = "ChatActivity"
 
@@ -128,15 +127,18 @@ class ChatActivity : AppCompatActivity() {
         val roomRef = FirebaseFirestore.getInstance().collection("rooms")
             .document(roomId)
 
-                val messageRef = roomRef.collection("messages")
+        val messageRef = roomRef.collection("messages")
             .get()
             .addOnSuccessListener { snapshots ->
                 val messageList = ArrayList<ChatMessage>()
-                for(docu in snapshots) {
+                Log.d(TAG, "snapshot count : ${snapshots.count()}" )
+
+                for (docu in snapshots) {
                     messageList.add(docu.toObject(ChatMessage::class.java))
                 }
-                if(messageList.isNotEmpty()) {
+                if (messageList.isNotEmpty()) {
                     setRoom(ChatRoom(_roomId, ArrayList<String>(), ChatMessageList(messageList)))
+                } else {
 
                 }
             }
@@ -173,23 +175,38 @@ class ChatActivity : AppCompatActivity() {
                 // 상대방과 대화흔적이 없으면 새로 생성한다.
                 _roomId = UUID.randomUUID().toString()
                 rooms.put(user!!.userId, _roomId)
-                ref.set(hashMapOf(
-                    "employeeNumber" to CurrentUser.employeeNumber,
-                    "name" to CurrentUser.name,
-                    "profileImg" to CurrentUser.profileImg,
-                    "roomList" to rooms,
-                    "userId" to CurrentUser.userId
-                ))
+                ref.set(
+                    hashMapOf(
+                        "employeeNumber" to CurrentUser.employeeNumber,
+                        "name" to CurrentUser.name,
+                        "profileImg" to CurrentUser.profileImg,
+                        "roomList" to rooms,
+                        "userId" to CurrentUser.userId
+                    )
+                )
                 putUserToRoom()
             }
         }
+    }
+
+    // room에 userList추가
+    private fun roomUserUpdate() {
+        val userList = listOf(CurrentUser.userId, user?.userId)
+        val ref = FirebaseFirestore.getInstance().collection("rooms")
+            .document(_roomId)
+
+        ref.set(
+            hashMapOf(
+                "userList" to userList
+            )
+        )
     }
 
     // 대화방에 상대방 추가 메소드
     private fun putUserToRoom() {
         val ref = FirebaseFirestore.getInstance().collection("users")
             .document(user!!.userId)
-ref
+        ref
             .get()
             .addOnSuccessListener {
                 val userInfo = it.toObject(UserInfo::class.java)
@@ -203,54 +220,8 @@ ref
                     "userId" to userInfo!!.userId
                 )
                 ref.set(updatedUserInfo)
+
+                roomUserUpdate()
             }
     }
-
-
-
-    private fun findRoom2() {
-        val currentUser = Firebase.auth.currentUser
-        val ref = FirebaseFirestore.getInstance().collection("users")
-            .document(currentUser!!.uid)
-            .get()
-            .addOnSuccessListener { userSnapshot ->
-                // 현재 User의 Chat Room ID 가져옴
-                val rooms = userSnapshot.data?.get("roomList") as ArrayList<String>
-
-                for (room in rooms) {
-                    val roomRef = FirebaseFirestore.getInstance().collection("rooms")
-                        .document(room)
-                        .get()
-                        .addOnSuccessListener { roomSnapshot ->
-                            val roomUsers = roomSnapshot.data?.get("userList") as ArrayList<String>
-
-                            if (roomUsers.count() == 2 && roomUsers.contains(user!!.userId)) {
-                                _roomId = room
-                            }
-                        }
-                }
-            }
-
-
-    }
-
-    private fun getMessageList() {
-        FirebaseFirestore.getInstance().collection("/MessageGroup").document(user!!.userId)
-            .get()
-            .addOnSuccessListener {
-                if (it != null) {
-
-                    _roomId = it.data?.get("roomId").toString()
-                    FirebaseFirestore.getInstance().collection("/Room").document(_roomId)
-                        .get()
-                        .addOnSuccessListener { docu ->
-                            val messages = HashMap(docu.data)
-                            for ((k, v) in messages) {
-
-                            }
-                        }
-                }
-            }
-    }
-
 }

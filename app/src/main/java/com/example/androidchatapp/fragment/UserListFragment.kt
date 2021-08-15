@@ -1,7 +1,6 @@
 package com.example.androidchatapp.fragment
 
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -9,13 +8,11 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.LiveData
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.androidchatapp.ProfileActivity
 import com.example.androidchatapp.adapters.GroupInfoAdapter
 import com.example.androidchatapp.adapters.OnItemClick
 import com.example.androidchatapp.databinding.FragmentUserListBinding
-import com.example.androidchatapp.models.GroupInfo
 import com.example.androidchatapp.models.SharedViewModel
 import com.example.androidchatapp.models.UserInfo
 import com.google.firebase.auth.ktx.auth
@@ -26,27 +23,15 @@ import com.google.firebase.ktx.Firebase
 private const val TAG = "UserListFragment"
 
 class UserListFragment : Fragment(), OnItemClick {
-//    private val _userList = MutableLiveData<ArrayList<GroupInfo>>()
-
-
-//    private var userList = ArrayList<GroupInfo>()
-
     companion object {
         lateinit var CurrentUser: UserInfo
     }
 
-    private var selectedPhotoUri: Uri? = null
     private var _binding: FragmentUserListBinding? = null
     private val binding get() = _binding!!
 
     // 데이터 공유 ViewModel
     private val sharedViewModel: SharedViewModel by activityViewModels()
-    val userList: LiveData<ArrayList<GroupInfo>>
-        get() {
-            return sharedViewModel.GroupList
-        }
-
-    private val _userList = ArrayList<GroupInfo>()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -68,7 +53,7 @@ class UserListFragment : Fragment(), OnItemClick {
     }
 
     private fun fetchUsers() {
-        getUsers()
+        sharedViewModel.initGroup()
 
         val ref = FirebaseFirestore.getInstance().collection("users")
 
@@ -84,19 +69,15 @@ class UserListFragment : Fragment(), OnItemClick {
                     when (dc.type) {
                         DocumentChange.Type.ADDED -> {
                             Log.d(TAG, "New User: ${dc.document.data}")
-//                            dc.document.data.apply {
-//                                sharedViewModel.addUser(
-//
-//                                    UserInfo(
-//                                        get("userId") as String,
-//                                        get("name") as String,
-//                                        get("profileImg") as String,
-//                                        get("roomId") as ArrayList<String>,
-//                                        get("employeeNumber").toString().toInt()
-//                                    )
-//                                )
-//                            }
-                            sharedViewModel.addUser(dc.document.toObject(UserInfo::class.java))
+                            val userInfo = dc.document.toObject(UserInfo::class.java)
+
+                            val groupName: String = if(userInfo.userId == Firebase.auth.currentUser!!.uid) {
+                                sharedViewModel.setCurrentUser(userInfo)
+                                "내 프로필"
+                            } else {
+                                "친구목록"
+                            }
+                            sharedViewModel.addUser(groupName, userInfo)
                         }
                         DocumentChange.Type.MODIFIED -> Log.d(TAG, "Modified: ${dc.document.data}")
                         DocumentChange.Type.REMOVED -> Log.d(TAG, "Removed: ${dc.document.data}")
@@ -105,58 +86,8 @@ class UserListFragment : Fragment(), OnItemClick {
             } else {
                 Log.d(TAG, "Current data: null")
             }
+            setupRecyclerView()
         }
-    }
-
-    private fun getUsers() {
-        _userList.clear()
-
-        val ref = FirebaseFirestore.getInstance().collection("users")
-        val fUsers = ArrayList<UserInfo>()
-        ref.get()
-            .addOnSuccessListener { snapshot ->
-                if (snapshot != null) {
-                    Log.d(TAG, "DocumentSize: ${snapshot.size()}")
-
-                    for (dc in snapshot) {
-                        Log.d(TAG, "DocumentSnapshot data: ${dc.data}")
-//                            fUsers.add(
-//                                UserInfo(
-//                                    get("uid") as String,
-//                                    get("name") as String,
-//                                    get("profileImg") as String,
-//                                    get("roomId") as ArrayList<String>,
-//                                    get("employeeNumber").toString().toInt()
-//                                )
-//                            )
-                        val userInfo = dc.toObject(UserInfo::class.java)
-                        fUsers.add(userInfo)
-                        if (userInfo.userId == Firebase.auth.currentUser!!.uid) {
-                            CurrentUser = userInfo
-                        }
-                    }
-
-                    val groupbyList = fUsers.groupBy { user ->
-                        user.userId == Firebase.auth.currentUser!!.uid
-                    }
-
-                    val sortedList =
-                        groupbyList.toSortedMap(compareBy<Boolean> { it }.thenBy { it })
-
-                    for ((k, v) in sortedList) {
-                        if (k) {
-                            _userList.add(GroupInfo("내 프로필", v))
-                        } else {
-                            _userList.add(GroupInfo("친구 목록", v))
-                        }
-                    }
-
-                    sharedViewModel.setUserList(_userList)
-                    setupRecyclerView()
-                } else {
-                    Log.d(TAG, "No such document")
-                }
-            }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -171,8 +102,7 @@ class UserListFragment : Fragment(), OnItemClick {
 
             layoutManager = LinearLayoutManager(requireActivity())
 
-            adapter = GroupInfoAdapter(userList?.value as List<GroupInfo>, this@UserListFragment)
-
+            adapter = sharedViewModel.GroupList.value?.let { GroupInfoAdapter(it, this@UserListFragment) }
         }
     }
 
@@ -191,17 +121,7 @@ class UserListFragment : Fragment(), OnItemClick {
                         val intent = Intent(it, ProfileActivity::class.java)
 
                         val userInfo = document.toObject(UserInfo::class.java)
-                        intent.putExtra(
-                            ProfileActivity.USER_KEY,
-//                            UserInfo(
-//                                get("uid").toString(),
-//                                get("name").toString(),
-//                                get("profileImg").toString(),
-//                                get("roomId") as ArrayList<String>,
-//                                get("employeeNumber").toString().toInt()))
-
-                            userInfo
-                        )
+                        intent.putExtra(ProfileActivity.USER_KEY, userInfo)
                         it.startActivity(intent)
                     }
                 }

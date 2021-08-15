@@ -6,21 +6,21 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.androidchatapp.databinding.GroupItemBinding
-import com.example.androidchatapp.models.GroupInfo
+import com.example.androidchatapp.models.UserInfo
 
-class GroupInfoAdapter(private val userList: List<GroupInfo>, private val mCallback: OnItemClick) :
+class GroupInfoAdapter(private val userList: HashMap<String, ArrayList<UserInfo>>, private val mCallback: OnItemClick) :
     RecyclerView.Adapter<GroupInfoAdapter.GroupInfoViewHolder>() {
     class GroupInfoViewHolder(
         private val binding: GroupItemBinding,
         private val mCallback: OnItemClick
         ) :
         RecyclerView.ViewHolder(binding.root) {
-        fun bind(groupInfo: GroupInfo) {
-            binding.groupName.text = groupInfo.category
+        fun bind(groupName:String, groupUsers: ArrayList<UserInfo>) {
+            binding.groupName.text = groupName
             binding.userListRecyclerView.apply {
                 setHasFixedSize(true)
                 layoutManager = LinearLayoutManager(binding.root.context)
-                adapter = UserInfoAdapter(groupInfo.userList, mCallback)
+                adapter = UserInfoAdapter(groupUsers, mCallback)
                 addItemDecoration(
                     DividerItemDecoration(
                         binding.root.context,
@@ -42,7 +42,9 @@ class GroupInfoAdapter(private val userList: List<GroupInfo>, private val mCallb
     }
 
     override fun onBindViewHolder(holder: GroupInfoViewHolder, position: Int) {
-        holder.bind(userList[position])
+        val key = userList.keys.toList()[position]
+
+        userList[key]?.let { holder.bind(key, it) }
     }
 
     override fun getItemCount() = userList.size
