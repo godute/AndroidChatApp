@@ -114,6 +114,7 @@ class ChatActivity : AppCompatActivity() {
                         }
                     }
                 }
+                binding.chatRecyclerView.scrollToPosition(groupieAdapter.itemCount-1)
                 binding.chatRecyclerView.adapter = groupieAdapter
             }
     }

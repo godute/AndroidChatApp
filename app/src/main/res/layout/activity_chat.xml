@@ -26,12 +26,15 @@
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/chat_recyclerView"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="0dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/chat_backButton" />
+            app:layout_constraintTop_toBottomOf="@id/chat_backButton"
+            app:layout_constraintBottom_toTopOf="@+id/chat_linear"
+            />
 
         <LinearLayout
+            android:id="@+id/chat_linear"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="#efefef"

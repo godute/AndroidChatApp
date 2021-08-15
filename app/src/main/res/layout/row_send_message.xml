@@ -22,16 +22,25 @@
             app:srcCompat="@drawable/ic_user" />
 
         <TextView
+            android:id="@+id/chat_to_userName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toTopOf="@id/chat_to_imageView"
+            app:layout_constraintEnd_toStartOf="@id/chat_to_imageView"
+            tools:text="me"
+            />
+
+        <TextView
             android:id="@+id/chat_from_textMessage"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="100dp"
-            android:background="@color/blue_light"
+            android:background="@color/message_sender_color"
             android:padding="10dp"
             android:text="@{message.content}"
             app:layout_constraintEnd_toStartOf="@+id/chat_to_imageView"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/chat_to_userName"
             tools:text="hello? hello? hello? hello? hello? hello? hello? hello? hello? hello? hello? hello? hello? hello? hello? hello? hello? hello? hello? hello? hello? hello? hello? hello? hello? hello? hello? hello? hello? hello? " />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
