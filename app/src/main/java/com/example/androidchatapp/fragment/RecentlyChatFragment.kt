@@ -7,9 +7,14 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.androidchatapp.adapters.RecentlyChatAdapter
 import com.example.androidchatapp.databinding.FragmentRecentlyChatBinding
 import com.example.androidchatapp.models.ChatMessageList
+import com.example.androidchatapp.models.RecentChatRoom
+import com.example.androidchatapp.models.RecentMessageItem
+import com.example.androidchatapp.models.SharedViewModel
+import com.example.androidchatapp.models.SharedViewModel.CurrentUser
+import com.google.firebase.firestore.FirebaseFirestore
+import com.xwray.groupie.GroupieAdapter
 
 private const val TAG = "RecentlyChatFragment"
 
@@ -17,6 +22,8 @@ class RecentlyChatFragment : Fragment() {
     private var _binding: FragmentRecentlyChatBinding? = null
     private val binding get() = _binding!!
     private lateinit var chatMessageList: List<ChatMessageList>
+
+    private val groupieAdapter = GroupieAdapter()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -27,14 +34,51 @@ class RecentlyChatFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        _binding = FragmentRecentlyChatBinding.inflate(inflater,container, false)
+        _binding = FragmentRecentlyChatBinding.inflate(inflater, container, false)
 
         binding.apply {
             recentlyChatFragment = this@RecentlyChatFragment
             lifecycleOwner = viewLifecycleOwner
         }
-
+        setupRecyclerView()
+        fetchRecentChatList()
         return binding.root
+    }
+
+    private fun fetchRecentChatList() {
+        SharedViewModel.initRecentMessage()
+
+        val userRef = FirebaseFirestore.getInstance().collection("users")
+            .document(CurrentUser.userId)
+            .get()
+            .addOnSuccessListener { document ->
+                val roomList = document.data?.get("roomList") as HashMap<String, String>
+
+                for ((k, roomId) in roomList) {
+                    val roomRef =
+                        FirebaseFirestore.getInstance().collection("rooms").document(roomId)
+                            .addSnapshotListener { snapshot, e ->
+                                if (e != null) {
+                                    Log.d(TAG, "Listen failed", e)
+                                    return@addSnapshotListener
+                                }
+
+                                if(snapshot != null) {
+                                    val recentRoom = snapshot.toObject(RecentChatRoom::class.java)
+                                    SharedViewModel.setRecentMessage(snapshot!!.id, recentRoom!!)
+                                }
+
+                                val sortedChatMap = SharedViewModel.RecentChatList.value!!.toList()
+                                    .sortedBy { (_, value) -> value.timestamp }.toMap()
+
+                                groupieAdapter.clear()
+                                for ((k, v) in sortedChatMap) {
+                                    groupieAdapter.add(RecentMessageItem(v.recentMessage))
+                                }
+                                binding.recentlyChatRecyclerView.adapter = groupieAdapter
+                            }
+                }
+            }
     }
 
     private fun setupRecyclerView() {
@@ -42,11 +86,9 @@ class RecentlyChatFragment : Fragment() {
         binding.recentlyChatRecyclerView.apply {
             setHasFixedSize(true)
 
-            layoutManager = LinearLayoutManager(requireActivity())
-
-            adapter = RecentlyChatAdapter(listOf())
-//            adapter = GroupInfoAdapter(userList?.value as List<GroupInfo>, this@UserListFragment)
-
+            if(requireActivity() != null) {
+                layoutManager = LinearLayoutManager(requireActivity())
+            }
         }
     }
 }

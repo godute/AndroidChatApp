@@ -92,7 +92,9 @@ class UserListFragment : Fragment(), OnItemClick {
         binding.groupListRecyclerView.apply {
             setHasFixedSize(true)
 
-            layoutManager = LinearLayoutManager(requireActivity())
+            if(requireActivity() != null) {
+                layoutManager = LinearLayoutManager(requireActivity())
+            }
 
             adapter = SharedViewModel.GroupList.value?.let { GroupInfoAdapter(it, this@UserListFragment) }
         }

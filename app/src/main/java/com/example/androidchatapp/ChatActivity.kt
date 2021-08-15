@@ -12,6 +12,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.ktx.Firebase
 import com.xwray.groupie.GroupieAdapter
 import java.util.*
+import kotlin.collections.ArrayList
 
 private const val TAG = "ChatActivity"
 
@@ -19,7 +20,7 @@ class ChatActivity : AppCompatActivity() {
     private var user: UserInfo? = null
     private var _binding: ActivityChatBinding? = null
     private val binding get() = _binding!!
-    val groupieAdapter = GroupieAdapter()
+    private val groupieAdapter = GroupieAdapter()
 
     private lateinit var _roomId: String
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -99,11 +100,13 @@ class ChatActivity : AppCompatActivity() {
                     Log.d(TAG, "Listen failed", e)
                     return@addSnapshotListener
                 }
+                var lastMessage:ChatMessage = ChatMessage()
                 for (dc in snapshot!!.documentChanges) {
                     when (dc.type) {
                         // 메세지가 Cloud Firestore에 추가된 경우
                         DocumentChange.Type.ADDED -> {
                             val message = dc.document.toObject(ChatMessage::class.java)
+                            lastMessage = message
                             // sender와 receiver 파악
                             if (message.senderId == Firebase.auth.currentUser!!.uid) {
                                 groupieAdapter.add(SendMessageItem(message))
@@ -114,6 +117,19 @@ class ChatActivity : AppCompatActivity() {
                         }
                     }
                 }
+
+                roomRef.get().addOnSuccessListener {
+                    val userList = it.data?.get("userList") as ArrayList<String>
+                    val recentMessage = RecentChatMessage(user!!.name, user!!.profileImg, lastMessage.content)
+
+                    roomRef.set(hashMapOf(
+                        "recentMessage" to recentMessage,
+                        "userList" to userList,
+                        "timestamp" to lastMessage.timestamp
+                    ))
+
+                }
+
                 binding.chatRecyclerView.scrollToPosition(groupieAdapter.itemCount-1)
                 binding.chatRecyclerView.adapter = groupieAdapter
             }

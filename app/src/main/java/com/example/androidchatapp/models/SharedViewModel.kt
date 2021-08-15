@@ -13,6 +13,9 @@ object SharedViewModel {
     private val _groupList = MutableLiveData<HashMap<String, ArrayList<UserInfo>>>()
     val GroupList: LiveData<HashMap<String, ArrayList<UserInfo>>> = _groupList
 
+    private val _recentChatList = MutableLiveData<HashMap<String, RecentChatRoom>>()
+    val RecentChatList: LiveData<HashMap<String, RecentChatRoom>> = _recentChatList
+
     fun initGroup() {
         _groupList.value = HashMap()
 
@@ -29,5 +32,13 @@ object SharedViewModel {
     fun addUser(group: String, user: UserInfo) {
         _groupList.value?.get(group)?.add(user)
         Log.d(TAG, "group List: ${_groupList.value}")
+    }
+
+    fun initRecentMessage() {
+        _recentChatList.value = HashMap()
+    }
+
+    fun setRecentMessage(key: String, message: RecentChatRoom) {
+        _recentChatList.value?.put(key, message)
     }
 }
