@@ -43,11 +43,9 @@ class TabActivity : AppCompatActivity() {
                         else -> MoreFragment()
                     }
 
-                    if(_fragment != null) {
-                        val transaction = supportFragmentManager.beginTransaction()
-                        transaction.replace(R.id.fragmentContainer, _fragment)
-                        transaction.commit()
-                    }
+                    val transaction = supportFragmentManager.beginTransaction()
+                    transaction.replace(R.id.fragmentContainer, _fragment)
+                    transaction.commit()
                 }
             })
 

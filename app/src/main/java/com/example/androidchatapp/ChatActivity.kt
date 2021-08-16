@@ -26,6 +26,9 @@ import kotlin.collections.ArrayList
 private const val TAG = "ChatActivity"
 
 class ChatActivity : AppCompatActivity() {
+    companion object {
+        val INVITED_USER_LIST = "INVITED_USER_LIST"
+    }
     private var user: UserInfo? = null
     private var _binding: ActivityChatBinding? = null
     private val binding get() = _binding!!
@@ -42,8 +45,10 @@ class ChatActivity : AppCompatActivity() {
 
     val startForResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result:ActivityResult ->
         if(result.resultCode == Activity.RESULT_OK) {
+            Log.d(TAG, "Get result")
             val intent = result.data
-            Log.d(TAG, intent.toString())
+            val invitedUserList = intent?.getStringArrayListExtra(INVITED_USER_LIST)
+            Log.d(TAG, "Invited user : $invitedUserList")
         }
     }
 
@@ -141,11 +146,14 @@ class ChatActivity : AppCompatActivity() {
                             }
 
                         }
+                        else -> {
+
+                        }
                     }
                 }
 
                 roomRef.get().addOnSuccessListener {
-                    val userList = it.data?.get("userList") as ArrayList<String>
+                    val userList = it.data?.get("userList") as ArrayList<*>
                     val recentMessage =
                         RecentChatMessage(user!!.name, user!!.profileImg, lastMessage.content)
 
@@ -221,7 +229,7 @@ class ChatActivity : AppCompatActivity() {
                         "userId" to SharedViewModel.CurrentUser.userId
                     )
                 )
-                putUserToRoom()
+                putUserToRoom(user!!.userId)
             }
 
             getRoom(_roomId)
@@ -242,9 +250,9 @@ class ChatActivity : AppCompatActivity() {
     }
 
     // 대화방에 상대방 추가 메소드
-    private fun putUserToRoom() {
+    private fun putUserToRoom(userId: String) {
         val ref = FirebaseFirestore.getInstance().collection("users")
-            .document(user!!.userId)
+            .document(userId)
         ref
             .get()
             .addOnSuccessListener {
@@ -274,22 +282,6 @@ class ChatActivity : AppCompatActivity() {
         }
     }
 
-    private fun listenRoomInfo() {
-        val roomRef = FirebaseFirestore.getInstance().collection("rooms")
-            .document(_roomId)
-            .addSnapshotListener { snapshot, e ->
-                if(e != null) {
-                    Log.d(TAG, "Snapshot listen failed")
-                    return@addSnapshotListener
-                }
-
-                if(snapshot != null) {
-                    userListInRoom = snapshot.data?.get("userList") as ArrayList<String>
-
-                }
-            }
-    }
-
     fun onGetImageClick() {
         getImageFromGallery()
     }
@@ -297,6 +289,7 @@ class ChatActivity : AppCompatActivity() {
     private fun getImageFromGallery() {
         getContent.launch("image/*")
     }
+
     fun onInviteClick() {
         val intent = Intent(this, InviteActivity::class.java)
 
@@ -304,5 +297,9 @@ class ChatActivity : AppCompatActivity() {
         intent.putExtra(ROOM_KEY, _roomId)
 
         startForResult.launch(intent)
+    }
+
+    private fun roomUpdate() {
+
     }
 }

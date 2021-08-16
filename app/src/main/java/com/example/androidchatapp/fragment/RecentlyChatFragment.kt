@@ -48,15 +48,14 @@ class RecentlyChatFragment : Fragment() {
     private fun fetchRecentChatList() {
         SharedViewModel.initRecentMessage()
 
-        val userRef = FirebaseFirestore.getInstance().collection("users")
+        FirebaseFirestore.getInstance().collection("users")
             .document(CurrentUser.userId)
             .get()
             .addOnSuccessListener { document ->
-                val roomList = document.data?.get("roomList") as HashMap<String, String>
+                val roomList = document.data?.get("roomList") as HashMap<*, *>
 
-                for ((k, roomId) in roomList) {
-                    val roomRef =
-                        FirebaseFirestore.getInstance().collection("rooms").document(roomId)
+                for ((_, roomId) in roomList) {
+                        FirebaseFirestore.getInstance().collection("rooms").document(roomId as String)
                             .addSnapshotListener { snapshot, e ->
                                 if (e != null) {
                                     Log.d(TAG, "Listen failed", e)
@@ -72,7 +71,7 @@ class RecentlyChatFragment : Fragment() {
                                     .sortedBy { (_, value) -> value.timestamp }.toMap()
 
                                 groupieAdapter.clear()
-                                for ((k, v) in sortedChatMap) {
+                                for ((_, v) in sortedChatMap) {
                                     groupieAdapter.add(RecentMessageItem(v.recentMessage))
                                 }
                                 binding.recentlyChatRecyclerView.adapter = groupieAdapter
