@@ -11,10 +11,15 @@ private const val TAG = "FirebaseAuthService"
 
 object FirebaseAuthService {
     private var auth = Firebase.auth
-    private lateinit var _listener: FirebaseAuthInterface
+    private lateinit var _signUpListener: FirebaseAuthSignUpListener
+    private lateinit var _signInListener: FirebaseAuthSignInListener
 
-    fun setOnSignupListener(listener: FirebaseAuthInterface) {
-        _listener = listener
+    fun setOnSignupListener(listener: FirebaseAuthSignUpListener) {
+        _signUpListener = listener
+    }
+
+    fun setOnSignInListener(listener: FirebaseAuthSignInListener) {
+        _signInListener = listener
     }
 
     fun signUp(signUpInfo: SignUpInfo) {
@@ -31,10 +36,24 @@ object FirebaseAuthService {
 
                     saveUserToFirebaseDatabase(uid, name, employeeNo)
 
-                    _listener.onSignUpComplete(true)
+                    _signUpListener.onSignUpComplete(true)
                 } else {
                     Log.w(TAG, "createUserWithEmail:failure", task.exception)
-                    _listener.onSignUpComplete(false)
+                    _signUpListener.onSignUpComplete(false)
+                }
+            }
+    }
+
+    fun signIn(email: String, password: String) {
+        auth.signInWithEmailAndPassword(email,password)
+            .addOnCompleteListener { task ->
+                if(task.isSuccessful) {
+                    Log.d(TAG, "signInWithEmail:success")
+                    _signInListener.onSignInComplete(true)
+                }
+                else {
+                    Log.w(TAG, "signInWithEmail:failure", task.exception)
+                    _signInListener.onSignInComplete(false)
                 }
             }
     }

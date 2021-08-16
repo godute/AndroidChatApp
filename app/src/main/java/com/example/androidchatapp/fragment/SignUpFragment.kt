@@ -11,7 +11,7 @@ import com.example.androidchatapp.R
 import com.example.androidchatapp.databinding.FragmentSignUpBinding
 import com.example.androidchatapp.models.LoginViewModel
 import com.example.androidchatapp.models.SignUpInfo
-import com.example.androidchatapp.services.FirebaseAuthInterface
+import com.example.androidchatapp.services.FirebaseAuthSignUpListener
 import com.example.androidchatapp.services.FirebaseAuthService
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
@@ -19,7 +19,7 @@ import com.google.firebase.ktx.Firebase
 
 private const val TAG = "LoginViewModel"
 
-class SignUpFragment : Fragment(), FirebaseAuthInterface {
+class SignUpFragment : Fragment(), FirebaseAuthSignUpListener {
     private val viewModel: LoginViewModel by activityViewModels()
     private lateinit var auth: FirebaseAuth
 

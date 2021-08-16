@@ -11,12 +11,14 @@ import androidx.navigation.fragment.findNavController
 import com.example.androidchatapp.R
 import com.example.androidchatapp.databinding.FragmentLoginBinding
 import com.example.androidchatapp.models.LoginViewModel
+import com.example.androidchatapp.services.FirebaseAuthService
+import com.example.androidchatapp.services.FirebaseAuthSignInListener
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 
 private const val TAG = "LoginFragment"
-class LoginFragment : Fragment() {
+class LoginFragment : Fragment(), FirebaseAuthSignInListener {
     private val viewModel: LoginViewModel by activityViewModels()
     private lateinit var auth: FirebaseAuth
 
@@ -35,6 +37,8 @@ class LoginFragment : Fragment() {
         // Inflate the layout for this fragment
         _binding = FragmentLoginBinding.inflate(inflater, container, false)
         auth = Firebase.auth
+
+        FirebaseAuthService.setOnSignInListener(this)
 
         return binding.root
     }
@@ -55,19 +59,16 @@ class LoginFragment : Fragment() {
 
     fun signIn() {
         Log.d("LoginViewModel", "Email: ${binding.loginEmailText.text.toString()}, password: ${binding.loginPasswordText.text.toString()}")
-        auth.signInWithEmailAndPassword(binding.loginEmailText.text.toString(), binding.loginPasswordText.text.toString())
-            .addOnCompleteListener(requireActivity()) { task ->
-                if(task.isSuccessful) {
-                    Log.d(TAG, "signInWithEmail:success")
-                    findNavController().navigate(R.id.action_loginFragment_to_tabActivity)
-                }
-                else {
-                    Log.w(TAG, "signInWithEmail:failure", task.exception)
-                }
-            }
+        FirebaseAuthService.signIn(binding.loginEmailText.text.toString(), binding.loginPasswordText.text.toString())
     }
 
     fun signUp() {
         findNavController().navigate(R.id.action_loginFragment_to_signUpFragment)
+    }
+
+    override fun onSignInComplete(signInResult: Boolean) {
+        if(signInResult) {
+            findNavController().navigate(R.id.action_loginFragment_to_tabActivity)
+        }
     }
 }
