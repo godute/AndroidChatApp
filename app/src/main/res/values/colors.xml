@@ -11,4 +11,5 @@
     <color name="lightblue_light">#8bf6ff</color>
     <color name="message_sender_color">#5fc9f8</color>
     <color name="message_receiver_color">#8e8e93</color>
+    <color name="floating_button_color">#1B5685</color>
 </resources>

@@ -2,6 +2,8 @@ package com.example.androidchatapp
 
 import android.os.Bundle
 import android.util.Log
+import android.view.animation.Animation
+import android.view.animation.AnimationUtils
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.androidchatapp.databinding.ActivityChatBinding
@@ -21,6 +23,10 @@ class ChatActivity : AppCompatActivity() {
     private var _binding: ActivityChatBinding? = null
     private val binding get() = _binding!!
     private val groupieAdapter = GroupieAdapter()
+
+    private lateinit var fab_open: Animation
+    private lateinit var fab_close: Animation
+
 
     private lateinit var _roomId: String
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -45,6 +51,9 @@ class ChatActivity : AppCompatActivity() {
     override fun onStart() {
         super.onStart()
         _roomId = ""
+
+        fab_open = AnimationUtils.loadAnimation(applicationContext, R.anim.fab_open)
+        fab_close = AnimationUtils.loadAnimation(applicationContext, R.anim.fab_close)
 
         try {
             user = intent.getParcelableExtra<UserInfo>(ProfileActivity.USER_KEY)
@@ -222,5 +231,16 @@ class ChatActivity : AppCompatActivity() {
 
                 roomUserUpdate()
             }
+    }
+
+    fun onToggle() {
+        if(binding.chatExpandButton.isChecked) {
+            binding.getImageButton.startAnimation(fab_open)
+            binding.inviteButton.startAnimation(fab_open)
+        }
+        else {
+            binding.getImageButton.startAnimation(fab_close)
+            binding.inviteButton.startAnimation(fab_close)
+        }
     }
 }

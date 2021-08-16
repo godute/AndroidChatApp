@@ -4,11 +4,13 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
+
         <variable
             name="chatActivity"
             type="com.example.androidchatapp.ChatActivity" />
 
     </data>
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -27,11 +29,35 @@
             android:id="@+id/chat_recyclerView"
             android:layout_width="0dp"
             android:layout_height="0dp"
+            app:layout_constraintBottom_toTopOf="@+id/chat_linear"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/chat_backButton"
-            app:layout_constraintBottom_toTopOf="@+id/chat_linear"
-            />
+            app:layout_constraintTop_toBottomOf="@id/chat_backButton" />
+
+
+        <ImageButton
+            android:id="@+id/getImageButton"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_margin="10dp"
+            android:backgroundTint="@color/floating_button_color"
+            android:visibility="invisible"
+            app:layout_constraintBottom_toTopOf="@id/chat_linear"
+            app:layout_constraintStart_toStartOf="parent"
+            app:srcCompat="@drawable/ic_image"
+            tools:src="@drawable/ic_image" />
+
+        <ImageButton
+            android:id="@+id/inviteButton"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_margin="10dp"
+            android:visibility="invisible"
+            android:backgroundTint="@color/floating_button_color"
+            app:layout_constraintBottom_toTopOf="@id/chat_linear"
+            app:layout_constraintStart_toEndOf="@id/getImageButton"
+            app:srcCompat="@drawable/ic_invite" />
+
 
         <LinearLayout
             android:id="@+id/chat_linear"
@@ -40,29 +66,46 @@
             android:background="#efefef"
             app:layout_constraintBottom_toBottomOf="parent">
 
+            <ToggleButton
+                android:id="@+id/chat_expandButton"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_gravity="center"
+                android:background="@drawable/ic_add"
+                android:backgroundTint="@color/floating_button_color"
+                android:textOff=""
+                android:textOn=""
+                android:onClick="@{() -> chatActivity.onToggle()}"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                />
+
             <EditText
                 android:id="@+id/chat_sendMessageText"
-                android:layout_width="316dp"
+                android:layout_width="300dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
                 android:layout_marginEnd="10dp"
                 android:layout_marginBottom="10dp"
                 android:hint="Enter message"
                 android:inputType="textPersonName"
-                tools:text="Hello?"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent" />
+                app:layout_constraintEnd_toStartOf="@+id/chat_sendMessageButton"
+                app:layout_constraintStart_toEndOf="@id/chat_expandButton"
+                tools:text="Hello?" />
 
             <Button
                 android:id="@+id/chat_sendMessageButton"
-                android:layout_width="wrap_content"
+                android:layout_width="50dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_marginEnd="10dp"
-                app:icon="@drawable/ic_send"
                 android:onClick="@{() -> chatActivity.sendMessage()}"
+                app:icon="@drawable/ic_send"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent" />
+                app:layout_constraintEnd_toEndOf="@+id/chat_linear"
+                app:layout_constraintTop_toTopOf="parent" />
         </LinearLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
