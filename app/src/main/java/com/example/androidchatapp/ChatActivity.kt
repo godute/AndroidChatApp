@@ -49,6 +49,10 @@ class ChatActivity : AppCompatActivity() {
             val intent = result.data
             val invitedUserList = intent?.getStringArrayListExtra(INVITED_USER_LIST)
             Log.d(TAG, "Invited user : $invitedUserList")
+
+            if(userListInRoom.count() == 2) {
+                invitedUserList?.let { makeGroup(it) }
+            }
         }
     }
 
@@ -84,7 +88,7 @@ class ChatActivity : AppCompatActivity() {
         } catch (e: Exception) {
             Log.d(TAG, e.toString())
         }
-        findRoom()
+        findRoom(_roomId)
 
     }
 
@@ -203,7 +207,7 @@ class ChatActivity : AppCompatActivity() {
         }
     }
 
-    private fun findRoom() {
+    private fun findRoom(roomId: String) {
         val currentUser = Firebase.auth.currentUser
         val ref = FirebaseFirestore.getInstance().collection("users")
             .document(currentUser!!.uid)
@@ -297,6 +301,41 @@ class ChatActivity : AppCompatActivity() {
         intent.putExtra(ROOM_KEY, _roomId)
 
         startForResult.launch(intent)
+    }
+
+    private fun makeGroup(users: ArrayList<String>) {
+        // 단체방 새로 생성
+        _roomId = UUID.randomUUID().toString()
+
+        val groupId = UUID.randomUUID().toString()
+        for (v in users) {
+            userListInRoom.add(v)
+        }
+        val roomRef = FirebaseFirestore.getInstance().collection("rooms")
+            .document(_roomId)
+
+        roomRef.set(hashMapOf(
+            "userList" to userListInRoom,
+        ))
+
+        // 사용자마다 갱신
+        for (userId in userListInRoom) {
+            val userRef = FirebaseFirestore.getInstance().collection("users")
+                .document(userId)
+                userRef.get()
+                .addOnSuccessListener { userDocument ->
+                    val userInfo = userDocument.toObject(UserInfo::class.java)
+                    userInfo!!.roomList.put(groupId, _roomId)
+
+                    userRef.set(hashMapOf(
+                        "userId" to userInfo.userId,
+                        "name" to userInfo.name,
+                        "profileImg" to userInfo.profileImg,
+                        "employeeNumber" to userInfo.employeeNumber,
+                        "roomList" to userInfo.roomList
+                    ))
+                }
+        }
     }
 
     private fun roomUpdate() {
