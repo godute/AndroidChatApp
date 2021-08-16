@@ -44,6 +44,7 @@
             android:visibility="invisible"
             app:layout_constraintBottom_toTopOf="@id/chat_linear"
             app:layout_constraintStart_toStartOf="parent"
+            android:onClick="@{() -> chatActivity.onGetImageClick()}"
             app:srcCompat="@drawable/ic_image"
             tools:src="@drawable/ic_image" />
 
@@ -53,6 +54,7 @@
             android:layout_height="60dp"
             android:layout_margin="10dp"
             android:visibility="invisible"
+            android:onClick="@{() -> chatActivity.onInviteClick()}"
             android:backgroundTint="@color/floating_button_color"
             app:layout_constraintBottom_toTopOf="@id/chat_linear"
             app:layout_constraintStart_toEndOf="@id/getImageButton"

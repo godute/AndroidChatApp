@@ -1,11 +1,18 @@
 package com.example.androidchatapp
 
+import android.app.Activity
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.androidchatapp.InviteActivity.Companion.ROOM_KEY
+import com.example.androidchatapp.InviteActivity.Companion.USERLIST_KEY
 import com.example.androidchatapp.databinding.ActivityChatBinding
 import com.example.androidchatapp.models.*
 import com.google.firebase.auth.ktx.auth
@@ -24,9 +31,21 @@ class ChatActivity : AppCompatActivity() {
     private val binding get() = _binding!!
     private val groupieAdapter = GroupieAdapter()
 
+    private var userListInRoom: ArrayList<String> = arrayListOf()
+
     private lateinit var fab_open: Animation
     private lateinit var fab_close: Animation
 
+    val getContent = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
+        // Handle the returned Uri
+    }
+
+    val startForResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result:ActivityResult ->
+        if(result.resultCode == Activity.RESULT_OK) {
+            val intent = result.data
+            Log.d(TAG, intent.toString())
+        }
+    }
 
     private lateinit var _roomId: String
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -41,11 +60,9 @@ class ChatActivity : AppCompatActivity() {
                 layoutManager = LinearLayoutManager(context)
 
                 adapter = groupieAdapter
-
             }
         }
         setContentView(binding.root)
-
     }
 
     override fun onStart() {
@@ -109,7 +126,7 @@ class ChatActivity : AppCompatActivity() {
                     Log.d(TAG, "Listen failed", e)
                     return@addSnapshotListener
                 }
-                var lastMessage:ChatMessage = ChatMessage()
+                var lastMessage: ChatMessage = ChatMessage()
                 for (dc in snapshot!!.documentChanges) {
                     when (dc.type) {
                         // 메세지가 Cloud Firestore에 추가된 경우
@@ -129,21 +146,23 @@ class ChatActivity : AppCompatActivity() {
 
                 roomRef.get().addOnSuccessListener {
                     val userList = it.data?.get("userList") as ArrayList<String>
-                    val recentMessage = RecentChatMessage(user!!.name, user!!.profileImg, lastMessage.content)
+                    val recentMessage =
+                        RecentChatMessage(user!!.name, user!!.profileImg, lastMessage.content)
 
-                    roomRef.set(hashMapOf(
-                        "recentMessage" to recentMessage,
-                        "userList" to userList,
-                        "timestamp" to lastMessage.timestamp
-                    ))
+                    roomRef.set(
+                        hashMapOf(
+                            "recentMessage" to recentMessage,
+                            "userList" to userList,
+                            "timestamp" to lastMessage.timestamp
+                        )
+                    )
 
                 }
 
-                binding.chatRecyclerView.scrollToPosition(groupieAdapter.itemCount-1)
+                binding.chatRecyclerView.scrollToPosition(groupieAdapter.itemCount - 1)
                 binding.chatRecyclerView.adapter = groupieAdapter
             }
     }
-
 
     // 현재 대화할 상대의 Room 가져옴
     private fun getRoom(roomId: String) {
@@ -154,7 +173,7 @@ class ChatActivity : AppCompatActivity() {
             .get()
             .addOnSuccessListener { snapshots ->
                 val messageList = ArrayList<ChatMessage>()
-                Log.d(TAG, "snapshot count : ${snapshots.count()}" )
+                Log.d(TAG, "snapshot count : ${snapshots.count()}")
 
                 for (docu in snapshots) {
                     messageList.add(docu.toObject(ChatMessage::class.java))
@@ -162,6 +181,18 @@ class ChatActivity : AppCompatActivity() {
 
                 listenForMessages()
             }
+
+        roomRef.addSnapshotListener { snapshot, e ->
+            if(e != null) {
+                Log.d(TAG, "Snapshot listen failed")
+                return@addSnapshotListener
+            }
+
+            if(snapshot != null) {
+                userListInRoom = snapshot.data?.get("userList") as ArrayList<String>
+
+            }
+        }
     }
 
     private fun findRoom() {
@@ -176,7 +207,7 @@ class ChatActivity : AppCompatActivity() {
 
             if (roomId != null) {
                 // 해당 채팅상대에 대한 room Id가 존재하면, room(대화방) 정보를 가져온다
-                    _roomId = roomId
+                _roomId = roomId
             } else {
                 // 상대방과 대화흔적이 없으면 새로 생성한다.
                 _roomId = UUID.randomUUID().toString()
@@ -234,13 +265,44 @@ class ChatActivity : AppCompatActivity() {
     }
 
     fun onToggle() {
-        if(binding.chatExpandButton.isChecked) {
+        if (binding.chatExpandButton.isChecked) {
             binding.getImageButton.startAnimation(fab_open)
             binding.inviteButton.startAnimation(fab_open)
-        }
-        else {
+        } else {
             binding.getImageButton.startAnimation(fab_close)
             binding.inviteButton.startAnimation(fab_close)
         }
+    }
+
+    private fun listenRoomInfo() {
+        val roomRef = FirebaseFirestore.getInstance().collection("rooms")
+            .document(_roomId)
+            .addSnapshotListener { snapshot, e ->
+                if(e != null) {
+                    Log.d(TAG, "Snapshot listen failed")
+                    return@addSnapshotListener
+                }
+
+                if(snapshot != null) {
+                    userListInRoom = snapshot.data?.get("userList") as ArrayList<String>
+
+                }
+            }
+    }
+
+    fun onGetImageClick() {
+        getImageFromGallery()
+    }
+
+    private fun getImageFromGallery() {
+        getContent.launch("image/*")
+    }
+    fun onInviteClick() {
+        val intent = Intent(this, InviteActivity::class.java)
+
+        intent.putExtra(USERLIST_KEY, userListInRoom)
+        intent.putExtra(ROOM_KEY, _roomId)
+
+        startForResult.launch(intent)
     }
 }

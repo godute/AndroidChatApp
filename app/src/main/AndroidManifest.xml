@@ -12,7 +12,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.AndroidChatApp">
-        <activity android:name=".ProfileActivity"></activity>
+        <activity android:name=".InviteActivity"></activity>
+        <activity android:name=".ProfileActivity" />
         <activity android:name=".ChatActivity" />
         <activity android:name=".TabActivity" />
         <activity android:name=".MainActivity">
