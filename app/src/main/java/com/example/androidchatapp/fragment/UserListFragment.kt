@@ -14,14 +14,14 @@ import com.example.androidchatapp.adapters.OnItemClick
 import com.example.androidchatapp.databinding.FragmentUserListBinding
 import com.example.androidchatapp.models.SharedViewModel
 import com.example.androidchatapp.models.UserInfo
+import com.example.androidchatapp.services.FirestoreGetUsersListener
+import com.example.androidchatapp.services.FirestoreService
 import com.google.firebase.auth.ktx.auth
-import com.google.firebase.firestore.DocumentChange
-import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.ktx.Firebase
 
 private const val TAG = "UserListFragment"
 
-class UserListFragment : Fragment(), OnItemClick {
+class UserListFragment : Fragment(), OnItemClick, FirestoreGetUsersListener {
     private var _binding: FragmentUserListBinding? = null
     private val binding get() = _binding!!
 
@@ -39,47 +39,15 @@ class UserListFragment : Fragment(), OnItemClick {
             userListFragment = this@UserListFragment
         }
 
+        FirestoreService.setOnFireStoreListener(this)
+
         fetchUsers()
 
         return binding.root
     }
 
     private fun fetchUsers() {
-        SharedViewModel.initGroup()
-
-        val ref = FirebaseFirestore.getInstance().collection("users")
-
-        ref.addSnapshotListener { snapshot, e ->
-            if (e != null) {
-                Log.w(TAG, "Listen failed", e)
-                return@addSnapshotListener
-            }
-
-            if (snapshot != null && !snapshot.isEmpty) {
-                Log.d(TAG, "Current data: ${snapshot.metadata}")
-                for (dc in snapshot!!.documentChanges) {
-                    when (dc.type) {
-                        DocumentChange.Type.ADDED -> {
-                            Log.d(TAG, "New User: ${dc.document.data}")
-                            val userInfo = dc.document.toObject(UserInfo::class.java)
-
-                            val groupName: String = if(userInfo.userId == Firebase.auth.currentUser!!.uid) {
-                                SharedViewModel.setCurrentUser(userInfo)
-                                "내 프로필"
-                            } else {
-                                "친구목록"
-                            }
-                            SharedViewModel.addUser(groupName, userInfo)
-                        }
-                        DocumentChange.Type.MODIFIED -> Log.d(TAG, "Modified: ${dc.document.data}")
-                        DocumentChange.Type.REMOVED -> Log.d(TAG, "Removed: ${dc.document.data}")
-                    }
-                }
-            } else {
-                Log.d(TAG, "Current data: null")
-            }
-            setupRecyclerView()
-        }
+        FirestoreService.fetchUsers()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -92,33 +60,34 @@ class UserListFragment : Fragment(), OnItemClick {
         binding.groupListRecyclerView.apply {
             setHasFixedSize(true)
 
-            if(requireActivity() != null) {
+            if (requireActivity() != null) {
                 layoutManager = LinearLayoutManager(requireActivity())
             }
 
-            adapter = SharedViewModel.GroupList.value?.let { GroupInfoAdapter(it, this@UserListFragment) }
+            adapter =
+                SharedViewModel.GroupList.value?.let { GroupInfoAdapter(it, this@UserListFragment) }
         }
     }
 
     override fun onProfileClick(uid: String) {
         Log.d(TAG, "onProfileClick Called $uid")
+        FirestoreService.getUser(uid)
+    }
 
+    override fun onGetAllUserComplete() {
+        setupRecyclerView()
+    }
+
+    override fun onStop() {
+        super.onStop()
+
+    }
+
+    override fun onGetUserComplete(userInfo: UserInfo) {
         activity?.let {
-            FirebaseFirestore.getInstance()
-                .collection("users")
-                .document(uid)
-                .get()
-                .addOnSuccessListener { document ->
-                    document?.apply {
-                        Log.d(TAG, "Success get User ${get("userId").toString()}")
-
-                        val intent = Intent(it, ProfileActivity::class.java)
-
-                        val userInfo = document.toObject(UserInfo::class.java)
-                        intent.putExtra(ProfileActivity.USER_KEY, userInfo)
-                        it.startActivity(intent)
-                    }
-                }
+            val intent = Intent(it, ProfileActivity::class.java)
+            intent.putExtra(ProfileActivity.USER_KEY, userInfo)
+            it.startActivity(intent)
         }
     }
 }
