@@ -8,7 +8,6 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.androidchatapp.databinding.FragmentRecentlyChatBinding
-import com.example.androidchatapp.models.ChatMessageList
 import com.example.androidchatapp.models.RecentChatRoom
 import com.example.androidchatapp.models.RecentMessageItem
 import com.example.androidchatapp.models.SharedViewModel
@@ -21,7 +20,6 @@ private const val TAG = "RecentlyChatFragment"
 class RecentlyChatFragment : Fragment() {
     private var _binding: FragmentRecentlyChatBinding? = null
     private val binding get() = _binding!!
-    private lateinit var chatMessageList: List<ChatMessageList>
 
     private val groupieAdapter = GroupieAdapter()
 

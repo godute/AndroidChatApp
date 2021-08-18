@@ -39,7 +39,7 @@ class UserListFragment : Fragment(), OnItemClick, FirestoreGetUsersListener {
             userListFragment = this@UserListFragment
         }
 
-        FirestoreService.setOnFireStoreListener(this)
+        FirestoreService.setOnFireStoreUserListener(this)
 
         fetchUsers()
 

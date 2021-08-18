@@ -1,9 +1,5 @@
 package com.example.androidchatapp.models
 
-data class ChatMessageList(
-    val chatMessages: ArrayList<ChatMessage> = ArrayList()
-)
-
 data class ChatMessage(
     val senderId: String = "",
     val receiverId: String = "",
