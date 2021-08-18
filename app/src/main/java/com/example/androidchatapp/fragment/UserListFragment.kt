@@ -7,21 +7,21 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.androidchatapp.ProfileActivity
 import com.example.androidchatapp.adapters.GroupInfoAdapter
 import com.example.androidchatapp.adapters.OnItemClick
 import com.example.androidchatapp.databinding.FragmentUserListBinding
 import com.example.androidchatapp.models.SharedViewModel
 import com.example.androidchatapp.models.UserInfo
-import com.example.androidchatapp.services.FirestoreGetUsersListener
+import com.example.androidchatapp.services.FirestoreGetAllUserListener
+import com.example.androidchatapp.services.FirestoreGetUserListener
 import com.example.androidchatapp.services.FirestoreService
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 
 private const val TAG = "UserListFragment"
 
-class UserListFragment : Fragment(), OnItemClick, FirestoreGetUsersListener {
+class UserListFragment : Fragment(), OnItemClick, FirestoreGetAllUserListener, FirestoreGetUserListener {
     private var _binding: FragmentUserListBinding? = null
     private val binding get() = _binding!!
 
@@ -39,7 +39,9 @@ class UserListFragment : Fragment(), OnItemClick, FirestoreGetUsersListener {
             userListFragment = this@UserListFragment
         }
 
-        FirestoreService.setOnFireStoreUserListener(this)
+        FirestoreService.setOnFireStoreGetUserListner(this)
+
+        FirestoreService.setOnFireStoreGetAllUserListener(this)
 
         fetchUsers()
 
@@ -59,10 +61,6 @@ class UserListFragment : Fragment(), OnItemClick, FirestoreGetUsersListener {
         Log.d(TAG, "setupRecyclerView Called")
         binding.groupListRecyclerView.apply {
             setHasFixedSize(true)
-
-            if (requireActivity() != null) {
-                layoutManager = LinearLayoutManager(requireActivity())
-            }
 
             adapter =
                 SharedViewModel.GroupList.value?.let { GroupInfoAdapter(it, this@UserListFragment) }

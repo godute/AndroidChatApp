@@ -6,7 +6,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.androidchatapp.TabActivity
 import com.example.androidchatapp.databinding.FragmentRecentlyChatBinding
 import com.example.androidchatapp.models.RecentMessageItem
@@ -56,61 +55,21 @@ class RecentlyChatFragment : Fragment(), FirestoreRecentChatRoomListener {
         FirestoreService.fetchRecentMessages()
     }
 
-//    private fun fetchRecentChatList() {
-//        SharedViewModel.initRecentMessage()
-//
-//        FirebaseFirestore.getInstance().collection("users")
-//            .document(CurrentUser.userId)
-//            .get()
-//            .addOnSuccessListener { document ->
-//                val roomList = document.data?.get("roomList") as HashMap<*, *>
-//
-//                for ((_, roomId) in roomList) {
-//                        FirebaseFirestore.getInstance().collection("rooms").document(roomId as String)
-//                            .addSnapshotListener { snapshot, e ->
-//                                if (e != null) {
-//                                    Log.d(TAG, "Listen failed", e)
-//                                    return@addSnapshotListener
-//                                }
-//
-//                                if(snapshot != null) {
-//                                    val recentRoom = snapshot.toObject(RecentChatRoom::class.java)
-//                                    SharedViewModel.setRecentMessage(snapshot!!.id, recentRoom!!)
-//                                }
-//
-//                                val sortedChatMap = SharedViewModel.RecentChatList.value!!.toList()
-//                                    .sortedBy { (_, value) -> value.timestamp }.toMap()
-//
-//                                groupieAdapter.clear()
-//                                for ((_, v) in sortedChatMap) {
-//                                    groupieAdapter.add(RecentMessageItem(v.recentMessage))
-//                                }
-//
-//                                binding.recentlyChatRecyclerView.adapter = groupieAdapter
-//                            }
-//                }
-//            }
-//    }
-
     private fun setupRecyclerView() {
         Log.d(TAG, "setupRecyclerView Called")
         binding.recentlyChatRecyclerView.apply {
             setHasFixedSize(true)
-
-            if(requireActivity() != null) {
-                layoutManager = LinearLayoutManager(requireActivity())
-            }
         }
     }
 
     override fun onRecentChatModified() {
         Log.d(TAG, "onRecentChatModified Called")
         val sortedChatMap = SharedViewModel.RecentChatList.value!!.toList()
-            .sortedBy { (_, value) -> value.timestamp }.toMap()
+            .sortedByDescending { (_, value) -> value.timestamp }.toMap()
 
         groupieAdapter.clear()
-        for ((_, v) in sortedChatMap) {
-            groupieAdapter.add(RecentMessageItem(v.recentMessage))
+        for ((k, v) in sortedChatMap) {
+            groupieAdapter.add(RecentMessageItem(v.recentMessage, sortedChatMap[k]!!.userList, v.timestamp))
         }
 
         binding.recentlyChatRecyclerView.adapter = groupieAdapter

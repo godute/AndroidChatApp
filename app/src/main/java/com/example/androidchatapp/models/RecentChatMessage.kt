@@ -7,7 +7,6 @@ data class RecentChatRoom(
 )
 
 data class RecentChatMessage(
-    val userName: String = "",
     val profileImg: String = "",
     val recentMessage: String = "",
 )

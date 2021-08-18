@@ -11,8 +11,8 @@ import com.example.androidchatapp.R
 import com.example.androidchatapp.databinding.FragmentSignUpBinding
 import com.example.androidchatapp.models.LoginViewModel
 import com.example.androidchatapp.models.SignUpInfo
-import com.example.androidchatapp.services.FirebaseAuthSignUpListener
 import com.example.androidchatapp.services.FirebaseAuthService
+import com.example.androidchatapp.services.FirebaseAuthSignUpListener
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
@@ -55,7 +55,7 @@ class SignUpFragment : Fragment(), FirebaseAuthSignUpListener {
     }
 
     fun signUp() {
-        val signupInfo:SignUpInfo = SignUpInfo(
+        val signupInfo = SignUpInfo(
             binding.signupEmailText.text.toString(),
             binding.signupPasswordText.text.toString(),
             binding.signupNameText.text.toString(),

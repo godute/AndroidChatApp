@@ -16,9 +16,10 @@ object FirestoreService {
     private var _currentUser = UserInfo()
     val CurrentUser: UserInfo get() = _currentUser
 
-    private lateinit var _fireStoreUserListener: FirestoreGetUsersListener
+    private lateinit var _fireStoreGetAllUserListener: FirestoreGetAllUserListener
+    private lateinit var _fireStoreGetUserListener: FirestoreGetUserListener
     private var _fireStoreRoomListener: FirestoreGetRoomListener? = null
-    private lateinit var _fireStoreRecentChatRoomListener: FirestoreRecentChatRoomListener
+    private var _fireStoreRecentChatRoomListener: FirestoreRecentChatRoomListener? = null
 
     private var _refUser = FirebaseFirestore.getInstance().collection("users")
     private var _refRoom = FirebaseFirestore.getInstance().collection("rooms")
@@ -28,8 +29,12 @@ object FirestoreService {
     private lateinit var _chatActivity: ChatActivity
     private lateinit var _tabActivity: TabActivity
 
-    fun setOnFireStoreUserListener(listener: FirestoreGetUsersListener) {
-        _fireStoreUserListener = listener
+    fun setOnFireStoreGetAllUserListener(listener: FirestoreGetAllUserListener) {
+        _fireStoreGetAllUserListener = listener
+    }
+
+    fun setOnFireStoreGetUserListner(listener: FirestoreGetUserListener) {
+        _fireStoreGetUserListener = listener
     }
 
     fun setOnFireStoreRoomListener(listener: FirestoreGetRoomListener) {
@@ -74,7 +79,7 @@ object FirestoreService {
                                     SharedViewModel.setCurrentUser(userInfo)
                                     "내 프로필"
                                 } else {
-                                    "친구목록"
+                                    "동료 목록"
                                 }
                             SharedViewModel.addUser(groupName, userInfo)
                         }
@@ -89,7 +94,7 @@ object FirestoreService {
             } else {
                 Log.d(TAG, "Current data: null")
             }
-            _fireStoreUserListener.onGetAllUserComplete()
+            _fireStoreGetAllUserListener.onGetAllUserComplete()
         }
     }
 
@@ -105,7 +110,7 @@ object FirestoreService {
                 val userInfo = document.toObject(UserInfo::class.java)
 
                 if (userInfo != null) {
-                    _fireStoreUserListener.onGetUserComplete(userInfo)
+                    _fireStoreGetUserListener.onGetUserComplete(userInfo)
                 }
             }
     }
@@ -171,10 +176,12 @@ object FirestoreService {
 
                 }
 
-                val recentMessage = RecentChatMessage("", "", lastMessage.content)
+                _refRoom.document(roomId).get().addOnSuccessListener {
+                    val recentMessage = RecentChatMessage("", lastMessage.content)
+                    _refRoom.document(roomId).update("recentMessage", recentMessage)
+                    _refRoom.document(roomId).update("timestamp", lastMessage.timestamp)
+                }
 
-                _refRoom.document(roomId).update("recentMessage", recentMessage)
-                _refRoom.document(roomId).update("timestamp", lastMessage.timestamp)
             }
     }
 
@@ -233,7 +240,7 @@ object FirestoreService {
                             SharedViewModel.removeRecentMessage(dc.document.id)
                         }
                     }
-                    _fireStoreRecentChatRoomListener.onRecentChatModified()
+                    _fireStoreRecentChatRoomListener?.onRecentChatModified()
                 }
             } else {
                 Log.d(TAG, "Current data: null")

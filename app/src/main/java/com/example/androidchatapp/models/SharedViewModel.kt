@@ -3,10 +3,12 @@ package com.example.androidchatapp.models
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import java.util.*
 
 private const val TAG = "SharedViewModel"
 
 object SharedViewModel {
+
     private var _currentUser = UserInfo()
     val CurrentUser:UserInfo get() = _currentUser
 
@@ -21,7 +23,7 @@ object SharedViewModel {
 
         _groupList.value!!["내 프로필"] = arrayListOf()
 
-        _groupList.value!!["친구목록"] = arrayListOf()
+        _groupList.value!!["동료 목록"] = arrayListOf()
     }
 
     // 현재 로그인한 사용자 설정
