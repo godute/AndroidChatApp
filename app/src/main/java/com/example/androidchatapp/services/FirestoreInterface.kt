@@ -12,3 +12,7 @@ interface FirestoreGetRoomListener {
     fun onGetRoomComplete()
     fun onGetMessage(message: ChatMessage)
 }
+
+interface FirestoreRecentChatRoomListener {
+    fun onRecentChatModified()
+}

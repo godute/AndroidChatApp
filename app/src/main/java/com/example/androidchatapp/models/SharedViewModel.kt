@@ -41,4 +41,8 @@ object SharedViewModel {
     fun setRecentMessage(key: String, message: RecentChatRoom) {
         _recentChatList.value?.put(key, message)
     }
+
+    fun removeRecentMessage(key: String) {
+        _recentChatList.value?.remove(key)
+    }
 }

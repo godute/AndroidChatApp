@@ -23,6 +23,7 @@ class TabActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+
         _binding = ActivityTabBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
@@ -45,7 +46,9 @@ class TabActivity : AppCompatActivity() {
 
                     val transaction = supportFragmentManager.beginTransaction()
                     transaction.replace(R.id.fragmentContainer, _fragment)
-                    transaction.commit()
+                    transaction.commitNow()
+
+
                 }
             })
 
@@ -54,6 +57,7 @@ class TabActivity : AppCompatActivity() {
 
         supportFragmentManager.beginTransaction()
             .add(R.id.fragmentContainer, UserListFragment())
-            .commit()
+            .commitNow()
+
     }
 }

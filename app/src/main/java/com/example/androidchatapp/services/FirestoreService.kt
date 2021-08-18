@@ -2,6 +2,7 @@ package com.example.androidchatapp.services
 
 import android.util.Log
 import com.example.androidchatapp.ChatActivity
+import com.example.androidchatapp.TabActivity
 import com.example.androidchatapp.models.*
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.DocumentChange
@@ -17,13 +18,15 @@ object FirestoreService {
 
     private lateinit var _fireStoreUserListener: FirestoreGetUsersListener
     private var _fireStoreRoomListener: FirestoreGetRoomListener? = null
+    private lateinit var _fireStoreRecentChatRoomListener: FirestoreRecentChatRoomListener
 
     private var _refUser = FirebaseFirestore.getInstance().collection("users")
     private var _refRoom = FirebaseFirestore.getInstance().collection("rooms")
 
     private lateinit var _groupId: String
 
-    private lateinit var _activity: ChatActivity
+    private lateinit var _chatActivity: ChatActivity
+    private lateinit var _tabActivity: TabActivity
 
     fun setOnFireStoreUserListener(listener: FirestoreGetUsersListener) {
         _fireStoreUserListener = listener
@@ -33,8 +36,16 @@ object FirestoreService {
         _fireStoreRoomListener = listener
     }
 
+    fun setOnFireStoreRecentChatRoomListener(listener: FirestoreRecentChatRoomListener) {
+        _fireStoreRecentChatRoomListener = listener
+    }
+
     fun setChatActivity(activity: ChatActivity) {
-        _activity = activity
+        _chatActivity = activity
+    }
+
+    fun setTabActivity(activity: TabActivity) {
+        _tabActivity = activity
     }
 
     fun closeFireStoreRoomListener() {
@@ -100,7 +111,7 @@ object FirestoreService {
     }
 
     fun listenRoom() {
-        _refRoom.addSnapshotListener(_activity) { snapshot, error ->
+        _refRoom.addSnapshotListener(_chatActivity) { snapshot, error ->
             if (error != null) {
                 Log.d(TAG, "addSnapshotListener failed.")
                 return@addSnapshotListener
@@ -141,7 +152,7 @@ object FirestoreService {
 
     fun listenMessage(roomId: String) {
         _refRoom.document(roomId).collection("messages").orderBy("timestamp")
-            .addSnapshotListener(_activity) { snapshot, e ->
+            .addSnapshotListener(_chatActivity) { snapshot, e ->
                 if (e != null) {
                     Log.d(TAG, "Listen Failed", e)
                     return@addSnapshotListener
@@ -198,5 +209,36 @@ object FirestoreService {
         val msgRef = _refRoom.document(roomId).collection("messages")
             .document()
         msgRef.set(message)
+    }
+
+    fun fetchRecentMessages() {
+        _refRoom.whereArrayContains("userList", Firebase.auth.currentUser!!.uid)
+            .addSnapshotListener { snapshot, e->
+            if(e != null) {
+                Log.d(TAG, "fetchRecentMessage addSnapshot Listener failed")
+                return@addSnapshotListener
+            }
+            if (snapshot != null && !snapshot.isEmpty) {
+                Log.d(TAG, "Current data: ${snapshot.metadata}")
+                for (dc in snapshot!!.documentChanges) {
+                    when (dc.type) {
+                        DocumentChange.Type.ADDED,
+                        DocumentChange.Type.MODIFIED -> {
+                            Log.d(TAG, "Added or Modified: ${dc.document.data}")
+                            val chatRoom = dc.document.toObject(RecentChatRoom::class.java)
+                            SharedViewModel.setRecentMessage(dc.document.id, chatRoom!!)
+                        }
+                        DocumentChange.Type.REMOVED -> {
+                            Log.d(TAG, "Removed: ${dc.document.data}")
+                            SharedViewModel.removeRecentMessage(dc.document.id)
+                        }
+                    }
+                    _fireStoreRecentChatRoomListener.onRecentChatModified()
+                }
+            } else {
+                Log.d(TAG, "Current data: null")
+            }
+
+        }
     }
 }
