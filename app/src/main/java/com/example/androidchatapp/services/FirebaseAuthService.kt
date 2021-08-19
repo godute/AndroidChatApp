@@ -49,6 +49,9 @@ object FirebaseAuthService {
             .addOnCompleteListener { task ->
                 if(task.isSuccessful) {
                     Log.d(TAG, "signInWithEmail:success")
+
+                    activateChangeCurrentUser(true)
+
                     _signInListener.onSignInComplete(true)
                 }
                 else {
@@ -56,6 +59,11 @@ object FirebaseAuthService {
                     _signInListener.onSignInComplete(false)
                 }
             }
+    }
+
+    fun signOut() {
+        activateChangeCurrentUser(false)
+        auth.signOut()
     }
 
     private fun saveUserToFirebaseDatabase(uid: String, name: String, employeeNo: Int ){
@@ -75,4 +83,11 @@ object FirebaseAuthService {
                 Log.d(TAG, "Finally we saved the user to Firebase Database")
             }
     }
+
+    private fun activateChangeCurrentUser(isActive: Boolean) {
+        FirebaseFirestore.getInstance().collection("users")
+            .document(auth.currentUser!!.uid)
+            .update("active",isActive)
+    }
+
 }
