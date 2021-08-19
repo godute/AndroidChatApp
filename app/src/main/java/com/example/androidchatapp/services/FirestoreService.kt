@@ -9,6 +9,7 @@ import com.google.firebase.firestore.DocumentChange
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.ktx.Firebase
 import java.util.*
+import kotlin.collections.HashMap
 
 private const val TAG = "FirestoreService"
 
@@ -124,25 +125,24 @@ object FirestoreService {
             if (snapshot != null && !snapshot.isEmpty) {
                 for (dc in snapshot!!.documentChanges) {
                     when (dc.type) {
-                        DocumentChange.Type.ADDED -> {
+                        DocumentChange.Type.ADDED, DocumentChange.Type.MODIFIED -> {
                             Log.d(TAG, "ADDED: ${dc.document.data}")
                             val userList = dc.document.data.get("userList") as ArrayList<String>
                             userList.map { userId ->
                                 _refUser.document(userId).get().addOnSuccessListener { docu ->
                                     val roomList =
-                                        docu.data?.get("roomList") as HashMap<String, String>
-                                    roomList[_groupId] = dc.document.id
-                                    _refUser.document(userId).update("groupList", hashMapOf(_groupId to userList))
+                                        docu.data?.get("roomList") as? HashMap<String, String> ?: HashMap()
+                                    val groupList =
+                                        docu.data?.get("groupList") as? HashMap<String, ArrayList<String>> ?: HashMap()
+                                    groupList?.set(_groupId, userList)
+
+                                    roomList?.set(_groupId, dc.document.id)
+                                    _refUser.document(userId).update("groupList", groupList)
                                     _refUser.document(userId).update("roomList", roomList)
                                 }
                             }
-
-
                         }
-                        DocumentChange.Type.MODIFIED -> {
-                            Log.d(TAG, "Modified: ${dc.document.data}")
 
-                        }
                         DocumentChange.Type.REMOVED -> {
                             Log.d(TAG, "Removed: ${dc.document.data}")
                         }
@@ -183,6 +183,19 @@ object FirestoreService {
                 }
 
             }
+    }
+
+    fun addUserToRoom(groupId: String, roomId: String, userList: ArrayList<String>) {
+        Log.d(TAG, "addUserToRoom ($groupId, $roomId, $userList) Called")
+        _groupId = groupId
+
+        _refRoom.document(roomId).get().addOnSuccessListener { document ->
+            val originUserList = document.data?.get("userList") as ArrayList<String>
+
+            userList.addAll(originUserList)
+
+            _refRoom.document(roomId).update("userList", userList)
+        }
     }
 
     fun createRoom(groupId: String, roomId: String, userList: ArrayList<String>) {

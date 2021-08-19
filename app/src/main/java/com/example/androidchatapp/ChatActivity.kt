@@ -34,29 +34,31 @@ class ChatActivity : AppCompatActivity(), FirestoreGetRoomListener {
     private val binding get() = _binding!!
     private val groupieAdapter = GroupieAdapter()
 
+    private var groupId: String? = null
+    private var roomId: String? = null
+
     private var userListInRoom: ArrayList<String> = arrayListOf()
 
     private lateinit var fab_open: Animation
     private lateinit var fab_close: Animation
 
-    val getContent = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
+    private val getContent = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
         // Handle the returned Uri
     }
 
-    val startForResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result:ActivityResult ->
+    private val startForResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
         if(result.resultCode == Activity.RESULT_OK) {
             Log.d(TAG, "Get result")
             val intent = result.data
             val invitedUserList = intent?.getStringArrayListExtra(INVITED_USER_LIST)
             Log.d(TAG, "Invited user : $invitedUserList")
 
-            if(userListInRoom.count() == 2) {
-                invitedUserList?.let { makeGroup(it) }
+            if (invitedUserList != null) {
+                inviteUsers(invitedUserList)
             }
         }
     }
 
-    private lateinit var _roomId: String
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -76,7 +78,6 @@ class ChatActivity : AppCompatActivity(), FirestoreGetRoomListener {
 
     override fun onStart() {
         super.onStart()
-        _roomId = ""
 
         fab_open = AnimationUtils.loadAnimation(applicationContext, R.anim.fab_open)
         fab_close = AnimationUtils.loadAnimation(applicationContext, R.anim.fab_close)
@@ -123,7 +124,7 @@ class ChatActivity : AppCompatActivity(), FirestoreGetRoomListener {
             System.currentTimeMillis() / 1000
         )
 
-        FirestoreService.sendMessage(_roomId, message)
+        FirestoreService.sendMessage(roomId!!, message)
 
         binding.chatSendMessageText.text.clear()
     }
@@ -137,10 +138,10 @@ class ChatActivity : AppCompatActivity(), FirestoreGetRoomListener {
             // 현재 User의 전체 Chat Room ID 가져옴
             Log.d(TAG, "findRoom addOnSuccessListener")
             val groups = userSnapshot.data?.get("groupList") as? HashMap<String, ArrayList<String>>
-            val rooms = userSnapshot.data?.get("roomList") as HashMap<String, String>
+            val rooms = userSnapshot.data?.get("roomList") as? HashMap<String, String> ?: HashMap()
 
-            var groupId: String? = null
-            var roomId: String? = null
+//            var groupId: String? = null
+            roomId = null
             if (groups != null) {
                 for ((k, v) in groups) {
                     if(v.count() == 2 && v.contains(user!!.userId)) {
@@ -156,35 +157,13 @@ class ChatActivity : AppCompatActivity(), FirestoreGetRoomListener {
                 roomId = UUID.randomUUID().toString()
                 groupId = System.currentTimeMillis().toString()
                 Log.d(TAG, "before create room groupId: $groupId, roomId: $roomId")
-                FirestoreService.createRoom(groupId, roomId, arrayListOf(currentUser!!.uid, user!!.userId))
+                FirestoreService.createRoom(groupId!!, roomId!!, arrayListOf(currentUser!!.uid, user!!.userId))
             }
             else {
                 Log.d(TAG, "getRoom before")
-                FirestoreService.getRoom(groupId!!, roomId)
+                FirestoreService.getRoom(groupId!!, roomId!!)
             }
-            _roomId = roomId
         }
-    }
-
-    // 대화방에 상대방 추가 메소드
-    private fun putUserToRoom(userId: String) {
-        val ref = FirebaseFirestore.getInstance().collection("users")
-            .document(userId)
-        ref
-            .get()
-            .addOnSuccessListener {
-                val userInfo = it.toObject(UserInfo::class.java)
-                userInfo?.roomList?.put(Firebase.auth.currentUser!!.uid, _roomId)
-
-                val updatedUserInfo = hashMapOf(
-                    "employeeNumber" to userInfo!!.employeeNumber,
-                    "name" to userInfo!!.name,
-                    "profileImg" to userInfo!!.profileImg,
-                    "roomList" to userInfo!!.roomList,
-                    "userId" to userInfo!!.userId
-                )
-                ref.set(updatedUserInfo)
-            }
     }
 
     fun onToggle() {
@@ -209,44 +188,13 @@ class ChatActivity : AppCompatActivity(), FirestoreGetRoomListener {
         val intent = Intent(this, InviteActivity::class.java)
 
         intent.putExtra(USERLIST_KEY, userListInRoom)
-        intent.putExtra(ROOM_KEY, _roomId)
+        intent.putExtra(ROOM_KEY, roomId)
 
         startForResult.launch(intent)
     }
 
-    private fun makeGroup(users: ArrayList<String>) {
-        // 단체방 새로 생성
-        _roomId = UUID.randomUUID().toString()
-
-        val groupId = UUID.randomUUID().toString()
-        for (v in users) {
-            userListInRoom.add(v)
-        }
-        val roomRef = FirebaseFirestore.getInstance().collection("rooms")
-            .document(_roomId)
-
-        roomRef.set(hashMapOf(
-            "userList" to userListInRoom,
-        ))
-
-        // 사용자마다 갱신
-        for (userId in userListInRoom) {
-            val userRef = FirebaseFirestore.getInstance().collection("users")
-                .document(userId)
-                userRef.get()
-                .addOnSuccessListener { userDocument ->
-                    val userInfo = userDocument.toObject(UserInfo::class.java)
-                    userInfo!!.roomList.put(groupId, _roomId)
-
-                    userRef.set(hashMapOf(
-                        "userId" to userInfo.userId,
-                        "name" to userInfo.name,
-                        "profileImg" to userInfo.profileImg,
-                        "employeeNumber" to userInfo.employeeNumber,
-                        "roomList" to userInfo.roomList
-                    ))
-                }
-        }
+    private fun inviteUsers(userList: ArrayList<String>) {
+        groupId?.let { FirestoreService.addUserToRoom(it, roomId!!, userList) }
     }
 
     override fun onGetRoomComplete() {
