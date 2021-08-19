@@ -205,6 +205,8 @@ object FirestoreService {
         _refRoom.document(roomId)
             .set(
                 hashMapOf(
+                    "groupId" to groupId,
+                    "roomId" to roomId,
                     "userList" to userList
                 )
             )

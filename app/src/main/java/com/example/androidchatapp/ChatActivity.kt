@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.androidchatapp.InviteActivity.Companion.ROOM_KEY
 import com.example.androidchatapp.InviteActivity.Companion.USERLIST_KEY
 import com.example.androidchatapp.databinding.ActivityChatBinding
+import com.example.androidchatapp.fragment.RecentlyChatFragment
 import com.example.androidchatapp.models.*
 import com.example.androidchatapp.services.FirestoreGetRoomListener
 import com.example.androidchatapp.services.FirestoreService
@@ -36,6 +37,7 @@ class ChatActivity : AppCompatActivity(), FirestoreGetRoomListener {
 
     private var groupId: String? = null
     private var roomId: String? = null
+    private var recentRoomInfo: RecentChatRoom? = null
 
     private var userListInRoom: ArrayList<String> = arrayListOf()
 
@@ -83,7 +85,8 @@ class ChatActivity : AppCompatActivity(), FirestoreGetRoomListener {
         fab_close = AnimationUtils.loadAnimation(applicationContext, R.anim.fab_close)
 
         try {
-            user = intent.getParcelableExtra<UserInfo>(ProfileActivity.USER_KEY)
+            user = intent.getParcelableExtra(ProfileActivity.USER_KEY) ?: null
+            recentRoomInfo = intent.getParcelableExtra(RecentlyChatFragment.RECENT_MESSAGE) ?: null
 
             Log.d(TAG, user!!.name)
 
@@ -93,8 +96,16 @@ class ChatActivity : AppCompatActivity(), FirestoreGetRoomListener {
 
         FirestoreService.setChatActivity(this)
         FirestoreService.setOnFireStoreRoomListener(this)
-        findRoom()
 
+        if(recentRoomInfo == null) {
+            findRoomByUserInfo()
+        }
+        else {
+            roomId = recentRoomInfo!!.roomId
+            groupId = recentRoomInfo!!.groupId
+
+            findRoomByRoomInfo()
+        }
     }
 
     override fun onPause() {
@@ -115,11 +126,9 @@ class ChatActivity : AppCompatActivity(), FirestoreGetRoomListener {
     fun sendMessage() {
         Log.d(TAG, "performSendMessage() called")
         val senderId = Firebase.auth.currentUser?.uid
-        val receiverId = user?.userId
 
         val message = ChatMessage(
             senderId!!,
-            receiverId!!,
             binding.chatSendMessageText.text.toString(),
             System.currentTimeMillis() / 1000
         )
@@ -129,7 +138,7 @@ class ChatActivity : AppCompatActivity(), FirestoreGetRoomListener {
         binding.chatSendMessageText.text.clear()
     }
 
-    private fun findRoom() {
+    private fun findRoomByUserInfo() {
         val currentUser = Firebase.auth.currentUser
         val ref = FirebaseFirestore.getInstance().collection("users")
             .document(currentUser!!.uid)
@@ -140,7 +149,6 @@ class ChatActivity : AppCompatActivity(), FirestoreGetRoomListener {
             val groups = userSnapshot.data?.get("groupList") as? HashMap<String, ArrayList<String>>
             val rooms = userSnapshot.data?.get("roomList") as? HashMap<String, String> ?: HashMap()
 
-//            var groupId: String? = null
             roomId = null
             if (groups != null) {
                 for ((k, v) in groups) {
@@ -151,12 +159,12 @@ class ChatActivity : AppCompatActivity(), FirestoreGetRoomListener {
                 }
             }
 
-            Log.d(TAG, "RoomId: $roomId")
+            Log.d(TAG, "RoomId: $recentRoomInfo")
             if (roomId.isNullOrEmpty()) {
                 Log.d(TAG, "create before")
                 roomId = UUID.randomUUID().toString()
                 groupId = System.currentTimeMillis().toString()
-                Log.d(TAG, "before create room groupId: $groupId, roomId: $roomId")
+                Log.d(TAG, "before create room groupId: $groupId, roomId: $recentRoomInfo")
                 FirestoreService.createRoom(groupId!!, roomId!!, arrayListOf(currentUser!!.uid, user!!.userId))
             }
             else {
@@ -164,6 +172,11 @@ class ChatActivity : AppCompatActivity(), FirestoreGetRoomListener {
                 FirestoreService.getRoom(groupId!!, roomId!!)
             }
         }
+    }
+
+    private fun findRoomByRoomInfo() {
+        Log.d(TAG, "findRoomByRoomInfo Called")
+        FirestoreService.getRoom(groupId!!, roomId!!)
     }
 
     fun onToggle() {
@@ -188,7 +201,7 @@ class ChatActivity : AppCompatActivity(), FirestoreGetRoomListener {
         val intent = Intent(this, InviteActivity::class.java)
 
         intent.putExtra(USERLIST_KEY, userListInRoom)
-        intent.putExtra(ROOM_KEY, roomId)
+        intent.putExtra(ROOM_KEY, recentRoomInfo)
 
         startForResult.launch(intent)
     }

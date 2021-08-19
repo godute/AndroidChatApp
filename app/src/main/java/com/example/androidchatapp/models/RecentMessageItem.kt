@@ -3,26 +3,33 @@ package com.example.androidchatapp.models
 import android.util.Log
 import android.view.View
 import com.example.androidchatapp.R
+import com.example.androidchatapp.adapters.OnRecentChatClick
 import com.example.androidchatapp.databinding.RecentlyChatItemBinding
 import com.xwray.groupie.viewbinding.BindableItem
 import java.text.SimpleDateFormat
 import java.util.*
 
-class RecentMessageItem(private val recentMessage: RecentChatMessage, private val userList: ArrayList<String>, private val timestamp: Long) : BindableItem<RecentlyChatItemBinding>(){
+class RecentMessageItem(private val recentMessage: RecentChatRoom, private val listener: OnRecentChatClick) :
+    BindableItem<RecentlyChatItemBinding>() {
 
     override fun bind(viewBinding: RecentlyChatItemBinding, position: Int) {
-        viewBinding.message = recentMessage
+        viewBinding.message = recentMessage.recentMessage
 
         var text = ""
-        userList.map { user->
+        recentMessage.userList.map { user->
             val name = SharedViewModel.GroupList.value!!["동료 목록"]?.singleOrNull { s -> s.userId == user }?.name
             if(name != null) text += "$name "
         }
         viewBinding.recentlyChatUserName.text = text
 
-        viewBinding.recentlyChatTimestamp.text = getTimestampText(timestamp)
+        viewBinding.recentlyChatTimestamp.text = getTimestampText(recentMessage.timestamp)
 
-        Log.d("RecentMessageItem", "${viewBinding.recentlyChatUserName.text}, ${userList}")
+        viewBinding.recentlyChatLayout.setOnClickListener {
+            Log.d("RecentMessageItem", "SetOnClick")
+            listener.onChatClick(recentMessage)
+        }
+
+        Log.d("RecentMessageItem", "${viewBinding.recentlyChatUserName.text}, ${recentMessage.userList}")
     }
 
     override fun getLayout(): Int = R.layout.recently_chat_item
