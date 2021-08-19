@@ -71,7 +71,7 @@ object FirestoreService {
                 Log.d(TAG, "Current data: ${snapshot.metadata}")
                 for (dc in snapshot!!.documentChanges) {
                     when (dc.type) {
-                        DocumentChange.Type.ADDED -> {
+                        DocumentChange.Type.ADDED ,DocumentChange.Type.MODIFIED -> {
                             Log.d(TAG, "New User: ${dc.document.data}")
                             val userInfo = dc.document.toObject(UserInfo::class.java)
 
@@ -84,9 +84,7 @@ object FirestoreService {
                                 }
                             SharedViewModel.addUser(groupName, userInfo)
                         }
-                        DocumentChange.Type.MODIFIED -> {
-                            Log.d(TAG, "Modified: ${dc.document.data}")
-                        }
+
                         DocumentChange.Type.REMOVED -> {
                             Log.d(TAG, "Removed: ${dc.document.data}")
                         }

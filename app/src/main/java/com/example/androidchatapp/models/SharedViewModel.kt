@@ -12,7 +12,7 @@ object SharedViewModel {
     private var _currentUser = UserInfo()
     val CurrentUser:UserInfo get() = _currentUser
 
-    private val _groupList = MutableLiveData<HashMap<String, ArrayList<UserInfo>>>()
+    private var _groupList = MutableLiveData<HashMap<String, ArrayList<UserInfo>>>()
     val GroupList: LiveData<HashMap<String, ArrayList<UserInfo>>> = _groupList
 
     private val _recentChatList = MutableLiveData<HashMap<String, RecentChatRoom>>()
@@ -21,9 +21,9 @@ object SharedViewModel {
     fun initGroup() {
         _groupList.value = HashMap()
 
-        _groupList.value!!["내 프로필"] = arrayListOf()
+        _groupList!!.value?.set("내 프로필", arrayListOf())
 
-        _groupList.value!!["동료 목록"] = arrayListOf()
+        _groupList!!.value?.set("동료 목록", arrayListOf())
     }
 
     // 현재 로그인한 사용자 설정
@@ -32,8 +32,19 @@ object SharedViewModel {
     }
 
     fun addUser(group: String, user: UserInfo) {
-        _groupList.value?.get(group)?.add(user)
-        Log.d(TAG, "group List: ${_groupList.value}")
+        val userInfo = _groupList?.value?.get(group)?.singleOrNull { u -> u.userId == user.userId }
+
+        if(userInfo == null) {
+            _groupList?.value?.get(group)?.add(user)
+        }
+        else {
+            val index = _groupList?.value?.get(group)?.indexOf(userInfo)
+            if (index != null) {
+                _groupList?.value?.get(group)?.set(index, user)
+            }
+        }
+
+        Log.d(TAG, "group List: ${_groupList}")
     }
 
     fun initRecentMessage() {

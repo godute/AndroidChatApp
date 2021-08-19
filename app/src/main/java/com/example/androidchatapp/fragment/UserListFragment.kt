@@ -63,7 +63,7 @@ class UserListFragment : Fragment(), OnItemClick, FirestoreGetAllUserListener, F
             setHasFixedSize(true)
 
             adapter =
-                SharedViewModel.GroupList.value?.let { GroupInfoAdapter(it, this@UserListFragment) }
+                GroupInfoAdapter(SharedViewModel.GroupList.value!!, this@UserListFragment)
         }
     }
 

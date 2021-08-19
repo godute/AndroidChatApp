@@ -9,5 +9,6 @@ data class UserInfo(
     var name: String = "",
     var profileImg: String = "",
     var roomList: HashMap<String, String> = HashMap(),
-    var employeeNumber: Int = 0
+    var employeeNumber: Int = 0,
+    var isActive: Boolean = false
 ) : Parcelable

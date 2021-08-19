@@ -65,7 +65,8 @@ object FirebaseAuthService {
             name,
             "",
             HashMap<String, String>(),
-            employeeNo
+            employeeNo,
+            false
         )
 
         db.collection("users").document(uid)
