@@ -1,5 +1,6 @@
 package com.example.androidchatapp.adapters
 
+import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
@@ -17,6 +18,10 @@ class UserInfoAdapter(private val userList: List<UserInfo>, private val callback
         fun bind(user: UserInfo) {
             with(binding) {
                 userName.text = user.name
+
+                if(user.isActive) userActive.setColorFilter(Color.GREEN)
+                else userActive.setColorFilter(Color.GRAY)
+
                 userProfile.setOnClickListener {
                     callback.onProfileClick(user.userId)
                 }

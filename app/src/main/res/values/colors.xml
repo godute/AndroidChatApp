@@ -12,4 +12,6 @@
     <color name="message_sender_color">#5fc9f8</color>
     <color name="message_receiver_color">#8e8e93</color>
     <color name="floating_button_color">#1B5685</color>
+    <color name="active_off">#5C5A5A</color>
+    <color name="active_on">#419B2D</color>
 </resources>
