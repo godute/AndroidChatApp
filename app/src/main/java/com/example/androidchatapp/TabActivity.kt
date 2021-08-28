@@ -23,7 +23,6 @@ class TabActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-
         _binding = ActivityTabBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
@@ -60,4 +59,6 @@ class TabActivity : AppCompatActivity() {
             .commitNow()
 
     }
+
+
 }

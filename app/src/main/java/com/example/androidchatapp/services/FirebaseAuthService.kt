@@ -5,6 +5,7 @@ import com.example.androidchatapp.models.SignUpInfo
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.ktx.Firebase
+import com.google.firebase.messaging.FirebaseMessaging
 
 private const val TAG = "FirebaseAuthService"
 
@@ -52,6 +53,8 @@ object FirebaseAuthService {
 
                     activateChangeCurrentUser(true)
 
+                    setUserToken()
+
                     _signInListener.onSignInComplete(true)
                 }
                 else {
@@ -90,4 +93,15 @@ object FirebaseAuthService {
             .update("active",isActive)
     }
 
+    private fun setUserToken() {
+        FirebaseMessaging.getInstance().token.addOnSuccessListener {
+            FirebaseFirestore.getInstance().collection("tokens")
+                .document(auth.currentUser!!.uid)
+                .set(
+                    mapOf(
+                        "token" to it
+                    )
+                )
+        }
+    }
 }
