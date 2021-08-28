@@ -15,5 +15,6 @@ data class RecentChatRoom(
 @Parcelize
 data class RecentChatMessage(
     val profileImg: String = "",
+    val senderId: String = "",
     val recentMessage: String = "",
 ) : Parcelable

@@ -8,6 +8,10 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.DocumentChange
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.ktx.Firebase
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+import retrofit2.Retrofit
 import java.util.*
 import kotlin.collections.HashMap
 
@@ -16,6 +20,8 @@ private const val TAG = "FirestoreService"
 object FirestoreService {
     private var _currentUser = UserInfo()
     val CurrentUser: UserInfo get() = _currentUser
+    private lateinit var retrofit:Retrofit
+    private var firebaseAPI = RetrofitClass.api
 
     private lateinit var _fireStoreGetAllUserListener: FirestoreGetAllUserListener
     private lateinit var _fireStoreGetUserListener: FirestoreGetUserListener
@@ -24,6 +30,7 @@ object FirestoreService {
 
     private var _refUser = FirebaseFirestore.getInstance().collection("users")
     private var _refRoom = FirebaseFirestore.getInstance().collection("rooms")
+    private var _refToken = FirebaseFirestore.getInstance().collection("tokens")
 
     private lateinit var _groupId: String
 
@@ -114,7 +121,8 @@ object FirestoreService {
             }
     }
 
-    fun listenRoom() {
+    private fun listenRoom() {
+//        initRetrofit()
         _refRoom.addSnapshotListener(_chatActivity) { snapshot, error ->
             if (error != null) {
                 Log.d(TAG, "addSnapshotListener failed.")
@@ -132,11 +140,25 @@ object FirestoreService {
                                         docu.data?.get("roomList") as? HashMap<String, String> ?: HashMap()
                                     val groupList =
                                         docu.data?.get("groupList") as? HashMap<String, ArrayList<String>> ?: HashMap()
+
                                     groupList?.set(_groupId, userList)
 
                                     roomList?.set(_groupId, dc.document.id)
                                     _refUser.document(userId).update("groupList", groupList)
                                     _refUser.document(userId).update("roomList", roomList)
+                                }
+                            }
+
+                            val recentMessage = dc.document.data.get("recentMessage") as? HashMap<String, String> ?: HashMap()
+
+                            val senderUserId = recentMessage["senderId"]
+                            Log.d(TAG, "Sender User Id : $senderUserId")
+
+                            if(!senderUserId.isNullOrEmpty()) {
+                                _refUser.document(senderUserId).get().addOnSuccessListener {
+                                    val senderName= it.data?.get("name").toString()
+                                    userList.remove(senderUserId)
+                                    sendPushMessage(userList, senderName, recentMessage["recentMessage"].toString())
                                 }
                             }
                         }
@@ -153,7 +175,7 @@ object FirestoreService {
         }
     }
 
-    fun listenMessage(roomId: String) {
+    private fun listenMessage(roomId: String) {
         _refRoom.document(roomId).collection("messages").orderBy("timestamp")
             .addSnapshotListener(_chatActivity) { snapshot, e ->
                 if (e != null) {
@@ -175,12 +197,34 @@ object FirestoreService {
                 }
 
                 _refRoom.document(roomId).get().addOnSuccessListener {
-                    val recentMessage = RecentChatMessage("", lastMessage.content)
+                    val recentMessage = RecentChatMessage("", lastMessage.senderId, lastMessage.content)
                     _refRoom.document(roomId).update("recentMessage", recentMessage)
                     _refRoom.document(roomId).update("timestamp", lastMessage.timestamp)
                 }
 
             }
+    }
+
+    private fun sendPushMessage(receiverList: ArrayList<String>, sender: String, message: String) {
+        receiverList.map { userId ->
+            _refToken.document(userId).get().addOnSuccessListener {
+                Log.d(TAG, "token : ${it.data?.get("token")}")
+                val notificationItem = NotificationItem("ChatApp", "$sender \n $message")
+                val fcmItem = FCMItem(it.data?.get("token").toString(), "high", notificationItem)
+                firebaseAPI.sendFCM(fcmItem).enqueue(object : Callback<ResponseDTO> {
+                    override fun onResponse(
+                        call: Call<ResponseDTO>,
+                        response: Response<ResponseDTO>
+                    ) {
+                        Log.d(TAG, "Push Message Success")
+                    }
+
+                    override fun onFailure(call: Call<ResponseDTO>, t: Throwable) {
+                        Log.d(TAG, "Push Message Failed")
+                    }
+                })
+            }
+        }
     }
 
     fun addUserToRoom(groupId: String, roomId: String, userList: ArrayList<String>) {

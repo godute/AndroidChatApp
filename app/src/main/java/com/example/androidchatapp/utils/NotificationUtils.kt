@@ -31,6 +31,6 @@ fun NotificationManager.sendNotification(messageBody: String, applicationContext
         .setPriority(NotificationCompat.PRIORITY_HIGH)
         .setAutoCancel(true)
         .setContentIntent(contentPendingIntent)
-        .setSmallIcon(R.drawable.ic_user)
+        .setSmallIcon(R.drawable.ic_notification)
     notify(NOTIFICATION_ID, builder.build())
 }
