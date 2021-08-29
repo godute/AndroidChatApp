@@ -2,8 +2,10 @@ package com.example.androidchatapp.services
 
 import android.util.Log
 import com.example.androidchatapp.ChatActivity
+import com.example.androidchatapp.GlobalApplication
 import com.example.androidchatapp.TabActivity
 import com.example.androidchatapp.models.*
+import com.example.androidchatapp.utils.getJsonDataFromSecrets
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.DocumentChange
 import com.google.firebase.firestore.FirebaseFirestore
@@ -211,7 +213,11 @@ object FirestoreService {
                 Log.d(TAG, "token : ${it.data?.get("token")}")
                 val notificationItem = NotificationItem("ChatApp", "$sender \n $message")
                 val fcmItem = FCMItem(it.data?.get("token").toString(), "high", notificationItem)
-                firebaseAPI.sendFCM(fcmItem).enqueue(object : Callback<ResponseDTO> {
+                val headers = HashMap<String, String>()
+                headers["Content-Type"] = "application/json"
+                headers["Authorization"] = "key=${getJsonDataFromSecrets(GlobalApplication.getContext()).toString()}"
+
+                firebaseAPI.sendFCM(headers, fcmItem).enqueue(object : Callback<ResponseDTO> {
                     override fun onResponse(
                         call: Call<ResponseDTO>,
                         response: Response<ResponseDTO>
