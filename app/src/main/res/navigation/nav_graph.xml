@@ -3,13 +3,13 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph.xml"
-    app:startDestination="@id/loginFragment">
+    app:startDestination="@id/signInFragment">
 
     <fragment
-        android:id="@+id/loginFragment"
-        android:name="com.example.androidchatapp.fragment.LoginFragment"
+        android:id="@+id/signInFragment"
+        android:name="com.example.androidchatapp.fragment.SignInFragment"
         android:label="@string/login_Frgament_lable"
-        tools:layout="@layout/fragment_login">
+        tools:layout="@layout/fragment_sign_in">
         <action
             android:id="@+id/action_loginFragment_to_signUpFragment"
             app:destination="@id/signUpFragment" />
@@ -26,7 +26,7 @@
         tools:layout="@layout/fragment_sign_up">
         <action
             android:id="@+id/action_signUpFragment_to_loginFragment"
-            app:destination="@id/loginFragment" />
+            app:destination="@id/signInFragment" />
     </fragment>
     <activity
         android:id="@+id/tabActivity"

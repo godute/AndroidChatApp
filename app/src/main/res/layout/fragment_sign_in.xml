@@ -5,16 +5,10 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     >
-
     <data>
-
         <variable
-            name="loginViewModel"
-            type="com.example.androidchatapp.models.LoginViewModel" />
-
-        <variable
-            name="loginFragment"
-            type="com.example.androidchatapp.fragment.LoginFragment" />
+            name="signInFragment"
+            type="com.example.androidchatapp.fragment.SignInFragment" />
     </data>
 
     <ScrollView
@@ -43,8 +37,7 @@
                     android:id="@+id/loginEmailText"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:singleLine="true"
-                    android:text="@{String.valueOf(loginViewModel.email)}" />
+                    android:singleLine="true" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
@@ -63,8 +56,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:inputType="textPassword"
-                    android:singleLine="true"
-                    android:text="@{String.valueOf(loginViewModel.password)}" />
+                    android:singleLine="true" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <Button
@@ -72,7 +64,7 @@
                 android:layout_width="0dp"
                 android:layout_height="60dp"
                 android:layout_marginTop="60dp"
-                android:onClick="@{()-> loginFragment.signIn()}"
+                android:onClick="@{()-> signInFragment.signIn()}"
                 android:text="@string/login_loginbutton"
                 app:layout_constraintEnd_toEndOf="@+id/loginPassword"
                 app:layout_constraintStart_toStartOf="@+id/loginPassword"
@@ -83,11 +75,10 @@
                 style="@style/Widget.MaterialComponents.Button.TextButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:onClick="@{() -> loginFragment.signUp()}"
+                android:onClick="@{() -> signInFragment.signUp()}"
                 android:text="@string/login_SignUp"
                 app:layout_constraintEnd_toEndOf="@+id/loginButton"
                 app:layout_constraintTop_toBottomOf="@+id/loginButton" />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
-
 </layout>

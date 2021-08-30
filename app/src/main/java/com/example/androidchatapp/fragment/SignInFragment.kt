@@ -6,36 +6,28 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import com.example.androidchatapp.R
-import com.example.androidchatapp.databinding.FragmentLoginBinding
-import com.example.androidchatapp.models.LoginViewModel
+import com.example.androidchatapp.databinding.FragmentSignInBinding
 import com.example.androidchatapp.services.FirebaseAuthService
 import com.example.androidchatapp.services.FirebaseAuthSignInListener
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 
-private const val TAG = "LoginFragment"
-class LoginFragment : Fragment(), FirebaseAuthSignInListener {
-    private val viewModel: LoginViewModel by activityViewModels()
+private const val TAG = "SignInFragment"
+class SignInFragment : Fragment(), FirebaseAuthSignInListener {
     private lateinit var auth: FirebaseAuth
 
-    private var _binding: FragmentLoginBinding? = null
+    private var _binding: FragmentSignInBinding? = null
     private val binding get() = _binding!!
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        _binding = FragmentLoginBinding.inflate(inflater, container, false)
+        _binding = FragmentSignInBinding.inflate(inflater, container, false)
         auth = Firebase.auth
 
         FirebaseAuthService.setOnSignInListener(this)
@@ -47,14 +39,8 @@ class LoginFragment : Fragment(), FirebaseAuthSignInListener {
         super.onViewCreated(view, savedInstanceState)
         _binding?.apply {
             lifecycleOwner = viewLifecycleOwner
-            loginViewModel = viewModel
-            loginFragment = this@LoginFragment
+            signInFragment = this@SignInFragment
         }
-    }
-
-    override fun onResume() {
-        super.onResume()
-        viewModel.init()
     }
 
     fun signIn() {

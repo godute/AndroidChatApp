@@ -5,11 +5,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import com.example.androidchatapp.R
 import com.example.androidchatapp.databinding.FragmentSignUpBinding
-import com.example.androidchatapp.models.LoginViewModel
 import com.example.androidchatapp.models.SignUpInfo
 import com.example.androidchatapp.services.FirebaseAuthService
 import com.example.androidchatapp.services.FirebaseAuthSignUpListener
@@ -20,7 +18,6 @@ import com.google.firebase.ktx.Firebase
 private const val TAG = "LoginViewModel"
 
 class SignUpFragment : Fragment(), FirebaseAuthSignUpListener {
-    private val viewModel: LoginViewModel by activityViewModels()
     private lateinit var auth: FirebaseAuth
 
     private var _binding: FragmentSignUpBinding? = null
@@ -35,15 +32,9 @@ class SignUpFragment : Fragment(), FirebaseAuthSignUpListener {
         return binding.root
     }
 
-    override fun onResume() {
-        super.onResume()
-        viewModel.init()
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         _binding?.apply {
-            signUpViewModel = viewModel
             lifecycleOwner = viewLifecycleOwner
             signUpFragment = this@SignUpFragment
         }
