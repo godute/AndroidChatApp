@@ -1,6 +1,7 @@
 package com.example.androidchatapp.fragment
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,15 +12,10 @@ import com.example.androidchatapp.databinding.FragmentSignUpBinding
 import com.example.androidchatapp.models.SignUpInfo
 import com.example.androidchatapp.services.FirebaseAuthService
 import com.example.androidchatapp.services.FirebaseAuthSignUpListener
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.ktx.Firebase
 
 private const val TAG = "LoginViewModel"
 
 class SignUpFragment : Fragment(), FirebaseAuthSignUpListener {
-    private lateinit var auth: FirebaseAuth
-
     private var _binding: FragmentSignUpBinding? = null
     private val binding get() = _binding!!
 
@@ -38,14 +34,15 @@ class SignUpFragment : Fragment(), FirebaseAuthSignUpListener {
             lifecycleOwner = viewLifecycleOwner
             signUpFragment = this@SignUpFragment
         }
-        auth = Firebase.auth
     }
 
     fun cancel() {
+        Log.d(TAG, "cancel() Called")
         findNavController().navigate(R.id.action_signUpFragment_to_loginFragment)
     }
 
     fun signUp() {
+        Log.d(TAG, "signUp() Called")
         val signupInfo = SignUpInfo(
             binding.signupEmailText.text.toString(),
             binding.signupPasswordText.text.toString(),
@@ -56,6 +53,7 @@ class SignUpFragment : Fragment(), FirebaseAuthSignUpListener {
     }
 
     override fun onSignUpComplete(signupResult: Boolean) {
+        Log.d(TAG, "onSignUpComplete() Called")
         if(signupResult) {
             findNavController().navigate(R.id.action_signUpFragment_to_loginFragment)
         }

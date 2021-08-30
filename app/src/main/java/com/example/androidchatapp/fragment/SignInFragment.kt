@@ -11,14 +11,9 @@ import com.example.androidchatapp.R
 import com.example.androidchatapp.databinding.FragmentSignInBinding
 import com.example.androidchatapp.services.FirebaseAuthService
 import com.example.androidchatapp.services.FirebaseAuthSignInListener
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.ktx.Firebase
 
 private const val TAG = "SignInFragment"
 class SignInFragment : Fragment(), FirebaseAuthSignInListener {
-    private lateinit var auth: FirebaseAuth
-
     private var _binding: FragmentSignInBinding? = null
     private val binding get() = _binding!!
 
@@ -28,10 +23,7 @@ class SignInFragment : Fragment(), FirebaseAuthSignInListener {
     ): View? {
         // Inflate the layout for this fragment
         _binding = FragmentSignInBinding.inflate(inflater, container, false)
-        auth = Firebase.auth
-
         FirebaseAuthService.setOnSignInListener(this)
-
         return binding.root
     }
 
@@ -44,15 +36,17 @@ class SignInFragment : Fragment(), FirebaseAuthSignInListener {
     }
 
     fun signIn() {
-        Log.d("LoginViewModel", "Email: ${binding.loginEmailText.text.toString()}, password: ${binding.loginPasswordText.text.toString()}")
+        Log.d(TAG, "signIn() Called")
         FirebaseAuthService.signIn(binding.loginEmailText.text.toString(), binding.loginPasswordText.text.toString())
     }
 
     fun signUp() {
+        Log.d(TAG, "signUp() Called")
         findNavController().navigate(R.id.action_loginFragment_to_signUpFragment)
     }
 
     override fun onSignInComplete(signInResult: Boolean) {
+        Log.d(TAG, "onSignInComplete($signInResult) Called")
         if(signInResult) {
             findNavController().navigate(R.id.action_loginFragment_to_tabActivity)
         }
