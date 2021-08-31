@@ -9,7 +9,6 @@ import com.google.firebase.messaging.FirebaseMessaging
 
 private const val TAG = "FirebaseAuthService"
 
-
 object FirebaseAuthService {
     private var auth = Firebase.auth
     private lateinit var _signUpListener: FirebaseAuthSignUpListener

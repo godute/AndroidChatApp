@@ -151,6 +151,8 @@ object FirestoreService {
                                 }
                             }
 
+                            _fireStoreRoomListener?.onGetRoomComplete(userList)
+
                             val recentMessage = dc.document.data.get("recentMessage") as? HashMap<String, String> ?: HashMap()
 
                             val senderUserId = recentMessage["senderId"]

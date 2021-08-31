@@ -110,6 +110,7 @@ class ChatActivity : AppCompatActivity(), FirestoreGetRoomListener {
 
     override fun onPause() {
         super.onPause()
+        groupieAdapter.clear()
         FirestoreService.closeFireStoreRoomListener()
     }
 
@@ -210,8 +211,10 @@ class ChatActivity : AppCompatActivity(), FirestoreGetRoomListener {
         groupId?.let { FirestoreService.addUserToRoom(it, roomId!!, userList) }
     }
 
-    override fun onGetRoomComplete() {
-        TODO("Not yet implemented")
+    override fun onGetRoomComplete(userList: ArrayList<String>) {
+        Log.d(TAG, "onGetRoomComplete($userList) Called")
+        userListInRoom.clear()
+        userListInRoom.addAll(userList)
     }
 
     override fun onGetMessage(message: ChatMessage) {
@@ -225,4 +228,5 @@ class ChatActivity : AppCompatActivity(), FirestoreGetRoomListener {
         }
         binding.chatRecyclerView.scrollToPosition(groupieAdapter.itemCount-1)
     }
+
 }

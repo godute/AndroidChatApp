@@ -12,7 +12,7 @@ interface FirestoreGetUserListener {
 }
 
 interface FirestoreGetRoomListener {
-    fun onGetRoomComplete()
+    fun onGetRoomComplete(userList: ArrayList<String>)
     fun onGetMessage(message: ChatMessage)
 }
 
