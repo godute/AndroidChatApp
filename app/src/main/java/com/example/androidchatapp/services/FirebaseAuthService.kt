@@ -86,10 +86,12 @@ object FirebaseAuthService {
             }
     }
 
-    private fun activateChangeCurrentUser(isActive: Boolean) {
-        FirebaseFirestore.getInstance().collection("users")
-            .document(auth.currentUser!!.uid)
-            .update("active",isActive)
+    fun activateChangeCurrentUser(isActive: Boolean) {
+        if(Firebase.auth.currentUser != null) {
+            FirebaseFirestore.getInstance().collection("users")
+                .document(auth.currentUser!!.uid)
+                .update("active", isActive)
+        }
     }
 
     private fun setUserToken() {
