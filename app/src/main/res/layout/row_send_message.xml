@@ -31,7 +31,7 @@
             />
 
         <TextView
-            android:id="@+id/chat_from_textMessage"
+            android:id="@+id/chat_to_textMessage"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="100dp"
@@ -43,5 +43,19 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/chat_to_userName"
             tools:text="hello? hello? hello? hello? hello? hello? hello? hello? hello? hello? hello? hello? hello? hello? hello? hello? hello? hello? hello? hello? hello? hello? hello? hello? hello? hello? hello? hello? hello? hello? " />
+
+        <ImageView
+            android:id="@+id/chat_to_imageMessage"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintHeight_max="200dp"
+            android:layout_marginStart="100dp"
+            android:background="@drawable/bubble_right_tail"
+            android:padding="10dp"
+            android:scaleType="centerInside"
+            app:layout_constraintEnd_toStartOf="@+id/chat_to_imageView"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/chat_to_userName"
+            tools:srcCompat="@tools:sample/backgrounds/scenic" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

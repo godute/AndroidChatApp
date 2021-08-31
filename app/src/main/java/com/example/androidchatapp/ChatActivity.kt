@@ -2,9 +2,11 @@ package com.example.androidchatapp
 
 import android.app.Activity
 import android.content.Intent
+import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import androidx.activity.result.ActivityResult
@@ -46,6 +48,12 @@ class ChatActivity : AppCompatActivity(), FirestoreGetRoomListener {
 
     private val getContent = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
         // Handle the returned Uri
+        Log.d(TAG, "$uri")
+        val inputStream = applicationContext.contentResolver.openInputStream(uri!!)
+        val bitmap = BitmapFactory.decodeStream(inputStream)
+        binding.chatImagePreview.visibility = View.VISIBLE
+        binding.chatImagePreviewClose.visibility = View.VISIBLE
+        binding.chatImagePreview.setImageBitmap(bitmap)
     }
 
     private val startForResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
@@ -207,6 +215,12 @@ class ChatActivity : AppCompatActivity(), FirestoreGetRoomListener {
         startForResult.launch(intent)
     }
 
+    fun closePreview() {
+        Log.d(TAG, "closePreivew() Called")
+        binding.chatImagePreview.visibility = View.GONE
+        binding.chatImagePreviewClose.visibility = View.GONE
+    }
+
     private fun inviteUsers(userList: ArrayList<String>) {
         groupId?.let { FirestoreService.addUserToRoom(it, roomId!!, userList) }
     }
@@ -221,10 +235,16 @@ class ChatActivity : AppCompatActivity(), FirestoreGetRoomListener {
         Log.d(TAG, "onGetMessage Called")
 
         if(message.senderId == Firebase.auth.currentUser!!.uid) {
-            groupieAdapter.add(SendMessageItem(message))
+            when (message.type) {
+                MessageType.TEXT -> groupieAdapter.add(SendMessageItem(message))
+                MessageType.IMAGE -> groupieAdapter.add(SendMessageItem(message))
+            }
         }
         else {
-            groupieAdapter.add(ReceiveMessageItem(message))
+            when(message.type) {
+                MessageType.TEXT -> groupieAdapter.add(ReceiveMessageItem(message))
+                MessageType.IMAGE -> groupieAdapter.add(ReceiveMessageItem(message))
+            }
         }
         binding.chatRecyclerView.scrollToPosition(groupieAdapter.itemCount-1)
     }

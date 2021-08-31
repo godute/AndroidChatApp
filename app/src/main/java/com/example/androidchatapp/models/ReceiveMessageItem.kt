@@ -9,6 +9,16 @@ import com.xwray.groupie.viewbinding.BindableItem
 class ReceiveMessageItem(private val chatMessage: ChatMessage) : BindableItem<RowReceiveMessageBinding>() {
     override fun bind(viewBinding: RowReceiveMessageBinding, position: Int) {
         viewBinding.message = chatMessage
+        when(chatMessage.type) {
+            MessageType.TEXT -> {
+                viewBinding.chatFromTextMessage.visibility = View.VISIBLE
+                viewBinding.chatFromImageMessage.visibility = View.GONE
+            }
+            MessageType.IMAGE -> {
+                viewBinding.chatFromTextMessage.visibility = View.GONE
+                viewBinding.chatFromImageMessage.visibility = View.VISIBLE
+            }
+        }
         FirebaseFirestore.getInstance().collection("users")
             .document(chatMessage.senderId)
             .get()
