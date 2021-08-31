@@ -1,9 +1,12 @@
 package com.example.androidchatapp.models
 
 import android.view.View
+import com.bumptech.glide.Glide
+import com.example.androidchatapp.GlobalApplication
 import com.example.androidchatapp.R
 import com.example.androidchatapp.databinding.RowSendMessageBinding
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.storage.FirebaseStorage
 import com.xwray.groupie.viewbinding.BindableItem
 
 class SendMessageItem(private val chatMessage: ChatMessage) : BindableItem<RowSendMessageBinding>() {
@@ -17,6 +20,11 @@ class SendMessageItem(private val chatMessage: ChatMessage) : BindableItem<RowSe
             MessageType.IMAGE -> {
                 viewBinding.chatToTextMessage.visibility = View.GONE
                 viewBinding.chatToImageMessage.visibility = View.VISIBLE
+                val storageRef = FirebaseStorage.getInstance()
+                val ref = storageRef.getReference(chatMessage.content)
+                Glide.with(GlobalApplication.getContext())
+                    .load(ref)
+                    .into(viewBinding.chatToImageView)
             }
         }
         FirebaseFirestore.getInstance().collection("users")

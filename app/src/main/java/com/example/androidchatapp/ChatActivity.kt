@@ -20,6 +20,8 @@ import com.example.androidchatapp.fragment.RecentlyChatFragment
 import com.example.androidchatapp.models.*
 import com.example.androidchatapp.services.FirestoreGetRoomListener
 import com.example.androidchatapp.services.FirestoreService
+import com.example.androidchatapp.services.StorageInterface
+import com.example.androidchatapp.services.StorageService
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.ktx.Firebase
@@ -28,7 +30,7 @@ import java.util.*
 
 private const val TAG = "ChatActivity"
 
-class ChatActivity : AppCompatActivity(), FirestoreGetRoomListener {
+class ChatActivity : AppCompatActivity(), FirestoreGetRoomListener, StorageInterface {
     companion object {
         val INVITED_USER_LIST = "INVITED_USER_LIST"
     }
@@ -41,6 +43,7 @@ class ChatActivity : AppCompatActivity(), FirestoreGetRoomListener {
     private var roomId: String? = null
     private var recentRoomInfo: RecentChatRoom? = null
 
+    private var imageUri: Uri? = null
     private var userListInRoom: ArrayList<String> = arrayListOf()
 
     private lateinit var fab_open: Animation
@@ -49,11 +52,14 @@ class ChatActivity : AppCompatActivity(), FirestoreGetRoomListener {
     private val getContent = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
         // Handle the returned Uri
         Log.d(TAG, "$uri")
-        val inputStream = applicationContext.contentResolver.openInputStream(uri!!)
-        val bitmap = BitmapFactory.decodeStream(inputStream)
-        binding.chatImagePreview.visibility = View.VISIBLE
-        binding.chatImagePreviewClose.visibility = View.VISIBLE
-        binding.chatImagePreview.setImageBitmap(bitmap)
+        imageUri = uri
+        if (imageUri != null) {
+            val inputStream = applicationContext.contentResolver.openInputStream(imageUri!!)
+            val bitmap = BitmapFactory.decodeStream(inputStream)
+            binding.chatImagePreview.visibility = View.VISIBLE
+            binding.chatImagePreviewClose.visibility = View.VISIBLE
+            binding.chatImagePreview.setImageBitmap(bitmap)
+        }
     }
 
     private val startForResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
@@ -104,6 +110,7 @@ class ChatActivity : AppCompatActivity(), FirestoreGetRoomListener {
 
         FirestoreService.setChatActivity(this)
         FirestoreService.setOnFireStoreRoomListener(this)
+        StorageService.setStorageListener(this)
 
         if(recentRoomInfo == null) {
             findRoomByUserInfo()
@@ -132,14 +139,26 @@ class ChatActivity : AppCompatActivity(), FirestoreGetRoomListener {
         finish()
     }
 
-    fun sendMessage() {
+    fun onSendButtonClick() {
+        Log.d(TAG, "onSendButtonClick() Called")
+
+        if(binding.chatImagePreview.visibility == View.VISIBLE) {
+            StorageService.uploadImageToFirebaseStorage(imageUri!!)
+        }
+        else {
+            sendMessage(MessageType.TEXT, binding.chatSendMessageText.text.toString())
+        }
+    }
+
+    fun sendMessage(type: MessageType, content: String) {
         Log.d(TAG, "performSendMessage() called")
         val senderId = Firebase.auth.currentUser?.uid
 
         val message = ChatMessage(
             senderId!!,
-            binding.chatSendMessageText.text.toString(),
-            System.currentTimeMillis() / 1000
+            content,
+            System.currentTimeMillis() / 1000,
+            type
         )
 
         FirestoreService.sendMessage(roomId!!, message)
@@ -249,4 +268,8 @@ class ChatActivity : AppCompatActivity(), FirestoreGetRoomListener {
         binding.chatRecyclerView.scrollToPosition(groupieAdapter.itemCount-1)
     }
 
+    override fun onFileUploadComplete(filePath: String) {
+        Log.d(TAG, "onFileUploadComplete($filePath) Called")
+        sendMessage(MessageType.IMAGE, filePath)
+    }
 }
