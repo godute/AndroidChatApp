@@ -15,6 +15,7 @@ import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
 import java.util.*
+import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 
 private const val TAG = "FirestoreService"
@@ -152,19 +153,6 @@ object FirestoreService {
                             }
 
                             _fireStoreRoomListener?.onGetRoomComplete(userList)
-
-                            val recentMessage = dc.document.data.get("recentMessage") as? HashMap<String, String> ?: HashMap()
-
-                            val senderUserId = recentMessage["senderId"]
-                            Log.d(TAG, "Sender User Id : $senderUserId")
-
-                            if(!senderUserId.isNullOrEmpty()) {
-                                _refUser.document(senderUserId).get().addOnSuccessListener {
-                                    val senderName= it.data?.get("name").toString()
-                                    userList.remove(senderUserId)
-                                    sendPushMessage(userList, senderName, recentMessage["recentMessage"].toString())
-                                }
-                            }
                         }
 
                         DocumentChange.Type.REMOVED -> {
@@ -281,6 +269,19 @@ object FirestoreService {
         val msgRef = _refRoom.document(roomId).collection("messages")
             .document()
         msgRef.set(message)
+
+        _refUser.document(message.senderId).get().addOnSuccessListener { sendUser ->
+            val senderName = sendUser.data?.get("name").toString()
+
+            _refRoom.document(roomId).get()
+                .addOnSuccessListener { roomUsers ->
+                    val userList = roomUsers.data?.get("userList") as? ArrayList<String> ?: ArrayList()
+                    userList.remove(message.senderId)
+                    sendPushMessage(userList, senderName, message.content)
+                }
+        }
+
+
     }
 
     fun fetchRecentMessages() {
