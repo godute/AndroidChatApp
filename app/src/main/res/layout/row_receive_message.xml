@@ -36,7 +36,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginEnd="100dp"
-            android:background="@color/message_receiver_color"
+            android:background="@drawable/bubble_left_tail"
             android:padding="10dp"
             android:text="@{message.content}"
             app:layout_constraintEnd_toEndOf="parent"

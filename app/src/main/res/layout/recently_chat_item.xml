@@ -4,7 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
-
         <variable
             name="message"
             type="com.example.androidchatapp.models.RecentChatMessage" />
@@ -14,6 +13,7 @@
         android:id="@+id/recently_chat_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="5dp"
         >
 
         <ImageView
@@ -33,7 +33,9 @@
             android:orientation="vertical"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toEndOf="@id/recently_chat_profile"
-            app:layout_constraintTop_toTopOf="parent">
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/recently_chat_timestamp"
+            >
 
             <TextView
                 android:id="@+id/recently_chat_userName"
