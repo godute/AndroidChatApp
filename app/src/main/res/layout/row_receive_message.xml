@@ -1,14 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
+
         <variable
             name="message"
             type="com.example.androidchatapp.models.ChatMessage" />
     </data>
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -26,10 +27,9 @@
             android:id="@+id/chat_from_userName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toTopOf="@id/chat_from_imageView"
             app:layout_constraintStart_toEndOf="@id/chat_from_imageView"
-            tools:text="user1"
-            />
+            app:layout_constraintTop_toTopOf="@id/chat_from_imageView"
+            tools:text="user1" />
 
         <TextView
             android:id="@+id/chat_from_textMessage"
@@ -39,6 +39,7 @@
             android:background="@drawable/bubble_left_tail"
             android:padding="10dp"
             android:text="@{message.content}"
+            android:visibility="gone"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/chat_from_imageView"
             app:layout_constraintTop_toBottomOf="@id/chat_from_userName"
@@ -48,14 +49,32 @@
             android:id="@+id/chat_from_imageMessage"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            app:layout_constraintHeight_max="200dp"
             android:layout_marginEnd="100dp"
             android:background="@drawable/bubble_left_tail"
             android:padding="10dp"
             android:scaleType="centerInside"
+            android:visibility="gone"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHeight_max="200dp"
             app:layout_constraintStart_toEndOf="@id/chat_from_imageView"
             app:layout_constraintTop_toBottomOf="@id/chat_from_userName"
             tools:srcCompat="@tools:sample/backgrounds/scenic" />
+
+        <ImageView
+            android:id="@+id/chat_from_fileView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="100dp"
+            android:background="@drawable/bubble_left_tail"
+            android:padding="10dp"
+            android:scaleType="centerInside"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHeight_max="70dp"
+            app:srcCompat="@drawable/ic_download"
+            app:layout_constraintStart_toEndOf="@id/chat_from_imageView"
+            app:layout_constraintTop_toBottomOf="@id/chat_from_userName"
+            tools:srcCompat="@drawable/ic_download_file" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

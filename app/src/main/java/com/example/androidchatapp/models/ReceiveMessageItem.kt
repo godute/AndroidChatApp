@@ -15,10 +15,8 @@ class ReceiveMessageItem(private val chatMessage: ChatMessage) : BindableItem<Ro
         when(chatMessage.type) {
             MessageType.TEXT -> {
                 viewBinding.chatFromTextMessage.visibility = View.VISIBLE
-                viewBinding.chatFromImageMessage.visibility = View.GONE
             }
             MessageType.IMAGE -> {
-                viewBinding.chatFromTextMessage.visibility = View.GONE
                 viewBinding.chatFromImageMessage.visibility = View.VISIBLE
 
                 FirebaseStorage.getInstance().getReference(chatMessage.content)
@@ -28,6 +26,9 @@ class ReceiveMessageItem(private val chatMessage: ChatMessage) : BindableItem<Ro
                             .load(it)
                             .into(viewBinding.chatFromImageMessage)
                     }
+            }
+            MessageType.FILE -> {
+                viewBinding.chatFromFileView.visibility = View.VISIBLE
             }
         }
         FirebaseFirestore.getInstance().collection("users")

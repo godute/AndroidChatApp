@@ -15,10 +15,8 @@ class SendMessageItem(private val chatMessage: ChatMessage) : BindableItem<RowSe
         when(chatMessage.type) {
             MessageType.TEXT -> {
                 viewBinding.chatToTextMessage.visibility = View.VISIBLE
-                viewBinding.chatToImageMessage.visibility = View.GONE
             }
             MessageType.IMAGE -> {
-                viewBinding.chatToTextMessage.visibility = View.GONE
                 viewBinding.chatToImageMessage.visibility = View.VISIBLE
 
                 FirebaseStorage.getInstance().getReference(chatMessage.content)
@@ -28,6 +26,9 @@ class SendMessageItem(private val chatMessage: ChatMessage) : BindableItem<RowSe
                             .load(it)
                             .into(viewBinding.chatToImageMessage)
                     }
+            }
+            MessageType.FILE -> {
+                viewBinding.chatToFileView.visibility = View.VISIBLE
             }
         }
         FirebaseFirestore.getInstance().collection("users")

@@ -17,18 +17,26 @@ object StorageService {
     }
 
     fun uploadImageToFirebaseStorage(uri: Uri) {
-        val fileName = UUID.randomUUID().toString() + ".jpg"
+        val fileName = UUID.randomUUID().toString()
         val ref = FirebaseStorage.getInstance().getReference("/images/$fileName")
 
         ref.putFile(uri)
             .addOnSuccessListener {
                 Log.d(TAG, "Successfully uploaded : ${it.metadata?.path}")
-                it.metadata?.path?.let { it1 -> _storageListener.onFileUploadComplete(it1) }
+                it.metadata?.path?.let { it1 -> _storageListener.onImageUploadComplete(it1) }
             }
     }
 
-    fun readImageFromFirebaseStorage(fileName: String) {
-        val ref = FirebaseStorage.getInstance().getReference(fileName)
-
+    fun uploadFileToFirebaseStorage(byteArray: ByteArray) {
+        val fileName = UUID.randomUUID().toString()
+        val ref = FirebaseStorage.getInstance().getReference("/files/$fileName")
+        ref.putBytes(byteArray)
+            .addOnSuccessListener {
+                Log.d(TAG, "File Successfully uploaded : ${it.metadata?.path}")
+                it.metadata?.path?.let { it1 -> _storageListener.onFileUploadComplete(it1) }
+            }
+            .addOnFailureListener {
+                Log.e(TAG, "File upload failed")
+            }
     }
 }

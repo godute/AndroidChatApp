@@ -33,6 +33,8 @@ private const val TAG = "ChatActivity"
 class ChatActivity : AppCompatActivity(), FirestoreGetRoomListener, StorageInterface {
     companion object {
         val INVITED_USER_LIST = "INVITED_USER_LIST"
+        var messageType: MessageType = MessageType.TEXT
+        var byteArray = byteArrayOf()
     }
     private var user: UserInfo? = null
     private var _binding: ActivityChatBinding? = null
@@ -64,6 +66,11 @@ class ChatActivity : AppCompatActivity(), FirestoreGetRoomListener, StorageInter
 
     private val getFileContent = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
         Log.d(TAG, "$uri")
+        val inputStream = applicationContext.contentResolver.openInputStream(uri!!)
+
+        byteArray = inputStream?.readBytes()!!.clone()
+        binding.chatFilePreview.visibility = View.VISIBLE
+        binding.chatImagePreviewClose.visibility = View.VISIBLE
     }
 
     private val startForResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
@@ -149,6 +156,9 @@ class ChatActivity : AppCompatActivity(), FirestoreGetRoomListener, StorageInter
         if(binding.chatImagePreview.visibility == View.VISIBLE) {
             StorageService.uploadImageToFirebaseStorage(imageUri!!)
         }
+        else if(binding.chatFilePreview.visibility == View.VISIBLE) {
+            StorageService.uploadFileToFirebaseStorage(byteArray)
+        }
         else {
             sendMessage(MessageType.TEXT, binding.chatSendMessageText.text.toString())
         }
@@ -228,7 +238,7 @@ class ChatActivity : AppCompatActivity(), FirestoreGetRoomListener, StorageInter
     }
 
     fun onFileAttachClick(){
-        getFileContent.launch("file/*")
+        getFileContent.launch("application/*")
     }
 
     private fun getImageFromGallery() {
@@ -264,22 +274,21 @@ class ChatActivity : AppCompatActivity(), FirestoreGetRoomListener, StorageInter
         Log.d(TAG, "onGetMessage Called")
 
         if(message.senderId == Firebase.auth.currentUser!!.uid) {
-            when (message.type) {
-                MessageType.TEXT -> groupieAdapter.add(SendMessageItem(message))
-                MessageType.IMAGE -> groupieAdapter.add(SendMessageItem(message))
-            }
+            groupieAdapter.add(SendMessageItem(message))
         }
         else {
-            when(message.type) {
-                MessageType.TEXT -> groupieAdapter.add(ReceiveMessageItem(message))
-                MessageType.IMAGE -> groupieAdapter.add(ReceiveMessageItem(message))
-            }
+            groupieAdapter.add(ReceiveMessageItem(message))
         }
         binding.chatRecyclerView.scrollToPosition(groupieAdapter.itemCount-1)
     }
 
+    override fun onImageUploadComplete(filePath: String) {
+        Log.d(TAG, "onImageUploadComplete($filePath) Called")
+        sendMessage(MessageType.IMAGE, filePath)
+    }
+
     override fun onFileUploadComplete(filePath: String) {
         Log.d(TAG, "onFileUploadComplete($filePath) Called")
-        sendMessage(MessageType.IMAGE, filePath)
+        sendMessage(MessageType.FILE, filePath)
     }
 }
