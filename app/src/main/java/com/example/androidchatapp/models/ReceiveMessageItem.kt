@@ -6,8 +6,7 @@ import com.example.androidchatapp.GlobalApplication
 import com.example.androidchatapp.R
 import com.example.androidchatapp.databinding.RowReceiveMessageBinding
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.ktx.Firebase
-import com.google.firebase.storage.ktx.storage
+import com.google.firebase.storage.FirebaseStorage
 import com.xwray.groupie.viewbinding.BindableItem
 
 class ReceiveMessageItem(private val chatMessage: ChatMessage) : BindableItem<RowReceiveMessageBinding>() {
@@ -21,10 +20,14 @@ class ReceiveMessageItem(private val chatMessage: ChatMessage) : BindableItem<Ro
             MessageType.IMAGE -> {
                 viewBinding.chatFromTextMessage.visibility = View.GONE
                 viewBinding.chatFromImageMessage.visibility = View.VISIBLE
-                val storageRef = Firebase.storage.getReference(chatMessage.content)
-                Glide.with(GlobalApplication.getContext())
-                    .load(storageRef)
-                    .into(viewBinding.chatFromImageView)
+
+                FirebaseStorage.getInstance().getReference(chatMessage.content)
+                    .downloadUrl
+                    .addOnSuccessListener {
+                        Glide.with(GlobalApplication.getContext())
+                            .load(it)
+                            .into(viewBinding.chatFromImageMessage)
+                    }
             }
         }
         FirebaseFirestore.getInstance().collection("users")

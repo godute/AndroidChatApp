@@ -20,11 +20,14 @@ class SendMessageItem(private val chatMessage: ChatMessage) : BindableItem<RowSe
             MessageType.IMAGE -> {
                 viewBinding.chatToTextMessage.visibility = View.GONE
                 viewBinding.chatToImageMessage.visibility = View.VISIBLE
-                val storageRef = FirebaseStorage.getInstance()
-                val ref = storageRef.getReference(chatMessage.content)
-                Glide.with(GlobalApplication.getContext())
-                    .load(ref)
-                    .into(viewBinding.chatToImageView)
+
+                FirebaseStorage.getInstance().getReference(chatMessage.content)
+                    .downloadUrl
+                    .addOnSuccessListener {
+                        Glide.with(GlobalApplication.getContext())
+                            .load(it)
+                            .into(viewBinding.chatToImageMessage)
+                    }
             }
         }
         FirebaseFirestore.getInstance().collection("users")
