@@ -8,5 +8,5 @@ data class ChatMessage(
 )
 
 enum class MessageType {
-    TEXT, IMAGE
+    TEXT, IMAGE, FILE
 }

@@ -49,7 +49,7 @@ class ChatActivity : AppCompatActivity(), FirestoreGetRoomListener, StorageInter
     private lateinit var fab_open: Animation
     private lateinit var fab_close: Animation
 
-    private val getContent = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
+    private val getImageContent = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
         // Handle the returned Uri
         Log.d(TAG, "$uri")
         imageUri = uri
@@ -60,6 +60,10 @@ class ChatActivity : AppCompatActivity(), FirestoreGetRoomListener, StorageInter
             binding.chatImagePreviewClose.visibility = View.VISIBLE
             binding.chatImagePreview.setImageBitmap(bitmap)
         }
+    }
+
+    private val getFileContent = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
+        Log.d(TAG, "$uri")
     }
 
     private val startForResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
@@ -211,9 +215,11 @@ class ChatActivity : AppCompatActivity(), FirestoreGetRoomListener, StorageInter
         if (binding.chatExpandButton.isChecked) {
             binding.getImageButton.startAnimation(fab_open)
             binding.inviteButton.startAnimation(fab_open)
+            binding.attachFileButton.startAnimation(fab_open)
         } else {
             binding.getImageButton.startAnimation(fab_close)
             binding.inviteButton.startAnimation(fab_close)
+            binding.attachFileButton.startAnimation(fab_close)
         }
     }
 
@@ -221,8 +227,12 @@ class ChatActivity : AppCompatActivity(), FirestoreGetRoomListener, StorageInter
         getImageFromGallery()
     }
 
+    fun onFileAttachClick(){
+        getFileContent.launch("file/*")
+    }
+
     private fun getImageFromGallery() {
-        getContent.launch("image/*")
+        getImageContent.launch("image/*")
     }
 
     fun onInviteClick() {
