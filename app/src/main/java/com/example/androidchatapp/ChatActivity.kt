@@ -157,6 +157,7 @@ class ChatActivity : AppCompatActivity(), FirestoreGetRoomListener, StorageInter
             StorageService.uploadImageToFirebaseStorage(imageUri!!)
         }
         else if(binding.chatFilePreview.visibility == View.VISIBLE) {
+            binding.chatProgressBar.visibility = View.VISIBLE
             StorageService.uploadFileToFirebaseStorage(byteArray)
         }
         else {
@@ -290,5 +291,6 @@ class ChatActivity : AppCompatActivity(), FirestoreGetRoomListener, StorageInter
     override fun onFileUploadComplete(filePath: String) {
         Log.d(TAG, "onFileUploadComplete($filePath) Called")
         sendMessage(MessageType.FILE, filePath)
+        binding.chatProgressBar.visibility = View.GONE
     }
 }
