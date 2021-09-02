@@ -145,7 +145,7 @@
             <ImageView
                 android:id="@+id/chat_filePreview"
                 android:layout_width="wrap_content"
-                android:layout_height="150dp"
+                android:layout_height="100dp"
                 android:visibility="gone"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -154,6 +154,7 @@
                 app:srcCompat="@drawable/ic_download_file" />
 
             <TextView
+                android:id="@+id/chat_filePreviewName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 app:layout_constraintEnd_toEndOf="parent"

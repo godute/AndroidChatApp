@@ -88,6 +88,8 @@ class ChatActivity : AppCompatActivity(), FirestoreGetRoomListener, StorageInter
         byteArray = inputStream?.readBytes()!!.clone()
         binding.chatFilePreview.visibility = View.VISIBLE
         binding.chatImagePreviewClose.visibility = View.VISIBLE
+        binding.chatFilePreviewName.visibility = View.VISIBLE
+        binding.chatFilePreviewName.text = fileInfo!!.fileName
     }
 
     private val startForResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
@@ -180,6 +182,8 @@ class ChatActivity : AppCompatActivity(), FirestoreGetRoomListener, StorageInter
         else {
             sendMessage(MessageType.TEXT, binding.chatSendMessageText.text.toString())
         }
+        onToggle()
+        closePreview()
     }
 
     fun sendMessage(type: MessageType, content: String) {
@@ -275,7 +279,9 @@ class ChatActivity : AppCompatActivity(), FirestoreGetRoomListener, StorageInter
     fun closePreview() {
         Log.d(TAG, "closePreivew() Called")
         binding.chatImagePreview.visibility = View.GONE
+        binding.chatFilePreview.visibility = View.GONE
         binding.chatImagePreviewClose.visibility = View.GONE
+        binding.chatFilePreviewName.visibility = View.GONE
     }
 
     private fun inviteUsers(userList: ArrayList<String>) {
