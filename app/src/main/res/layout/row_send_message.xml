@@ -61,20 +61,35 @@
             app:layout_constraintTop_toBottomOf="@+id/chat_to_userName"
             tools:srcCompat="@tools:sample/backgrounds/scenic" />
 
-        <ImageView
-            android:id="@+id/chat_to_fileView"
+        <LinearLayout
+            android:id="@+id/chat_to_fileViewLayout"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="100dp"
             android:background="@drawable/bubble_right_tail"
             android:padding="10dp"
-            android:scaleType="centerInside"
+            android:orientation="vertical"
             android:visibility="gone"
+            android:scaleType="centerInside"
             app:layout_constraintEnd_toStartOf="@+id/chat_to_imageView"
-            app:layout_constraintHeight_max="70dp"
+            app:layout_constraintHeight_max="120dp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/chat_to_userName"
-            app:srcCompat="@drawable/ic_download_file"
-            tools:srcCompat="@drawable/ic_download_file" />
+            >
+            <ImageView
+                android:id="@+id/chat_to_fileView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                app:srcCompat="@drawable/ic_download_file"
+                tools:srcCompat="@drawable/ic_download_file" />
+            <TextView
+                android:id="@+id/chat_to_fileName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                tools:text="Sample.doc"/>
+        </LinearLayout>
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

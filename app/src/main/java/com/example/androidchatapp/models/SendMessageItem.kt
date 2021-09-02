@@ -29,7 +29,8 @@ class SendMessageItem(private val chatMessage: ChatMessage, private val listener
                     }
             }
             MessageType.FILE -> {
-                viewBinding.chatToFileView.visibility = View.VISIBLE
+                viewBinding.chatToFileViewLayout.visibility = View.VISIBLE
+                viewBinding.chatToFileName.text = chatMessage.content.substring(chatMessage.content.lastIndexOf("/")+1)
                 viewBinding.chatToFileView.setOnClickListener {
                     listener?.onFileUriClick(chatMessage.content)
                 }
