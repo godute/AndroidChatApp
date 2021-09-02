@@ -5,11 +5,12 @@ import com.bumptech.glide.Glide
 import com.example.androidchatapp.GlobalApplication
 import com.example.androidchatapp.R
 import com.example.androidchatapp.databinding.RowReceiveMessageBinding
+import com.example.androidchatapp.services.FileDownloadInterface
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
 import com.xwray.groupie.viewbinding.BindableItem
 
-class ReceiveMessageItem(private val chatMessage: ChatMessage) : BindableItem<RowReceiveMessageBinding>() {
+class ReceiveMessageItem(private val chatMessage: ChatMessage, private val listener: FileDownloadInterface) : BindableItem<RowReceiveMessageBinding>() {
     override fun bind(viewBinding: RowReceiveMessageBinding, position: Int) {
         viewBinding.message = chatMessage
         when(chatMessage.type) {
@@ -29,6 +30,9 @@ class ReceiveMessageItem(private val chatMessage: ChatMessage) : BindableItem<Ro
             }
             MessageType.FILE -> {
                 viewBinding.chatFromFileView.visibility = View.VISIBLE
+                viewBinding.chatFromFileView.setOnClickListener {
+                    listener.onFileUriClick(chatMessage.content)
+                }
             }
         }
         FirebaseFirestore.getInstance().collection("users")
@@ -39,6 +43,7 @@ class ReceiveMessageItem(private val chatMessage: ChatMessage) : BindableItem<Ro
                     viewBinding.chatFromUserName.text = it.data?.get("name").toString()
                 }
             }
+
     }
 
     override fun getLayout(): Int = R.layout.row_receive_message

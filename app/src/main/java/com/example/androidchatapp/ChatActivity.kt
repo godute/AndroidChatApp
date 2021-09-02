@@ -5,6 +5,7 @@ import android.content.Intent
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
+import android.provider.MediaStore
 import android.util.Log
 import android.view.View
 import android.view.animation.Animation
@@ -18,10 +19,8 @@ import com.example.androidchatapp.InviteActivity.Companion.USERLIST_KEY
 import com.example.androidchatapp.databinding.ActivityChatBinding
 import com.example.androidchatapp.fragment.RecentlyChatFragment
 import com.example.androidchatapp.models.*
-import com.example.androidchatapp.services.FirestoreGetRoomListener
-import com.example.androidchatapp.services.FirestoreService
-import com.example.androidchatapp.services.StorageInterface
-import com.example.androidchatapp.services.StorageService
+import com.example.androidchatapp.services.*
+import com.example.androidchatapp.utils.FileUtils
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.ktx.Firebase
@@ -30,7 +29,7 @@ import java.util.*
 
 private const val TAG = "ChatActivity"
 
-class ChatActivity : AppCompatActivity(), FirestoreGetRoomListener, StorageInterface {
+class ChatActivity : AppCompatActivity(), FirestoreGetRoomListener, StorageInterface, FileDownloadInterface {
     companion object {
         val INVITED_USER_LIST = "INVITED_USER_LIST"
         var messageType: MessageType = MessageType.TEXT
@@ -51,9 +50,12 @@ class ChatActivity : AppCompatActivity(), FirestoreGetRoomListener, StorageInter
     private lateinit var fab_open: Animation
     private lateinit var fab_close: Animation
 
+    private var fileInfo: FileInfo? = null
+
     private val getImageContent = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
         // Handle the returned Uri
         Log.d(TAG, "$uri")
+
         imageUri = uri
         if (imageUri != null) {
             val inputStream = applicationContext.contentResolver.openInputStream(imageUri!!)
@@ -67,7 +69,22 @@ class ChatActivity : AppCompatActivity(), FirestoreGetRoomListener, StorageInter
     private val getFileContent = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
         Log.d(TAG, "$uri")
         val inputStream = applicationContext.contentResolver.openInputStream(uri!!)
+        val cr = applicationContext.contentResolver
+        val projection: Array<String> = arrayOf(MediaStore.MediaColumns.DISPLAY_NAME
+        , MediaStore.MediaColumns.MIME_TYPE)
+        val cursor = cr.query(uri, projection, null, null, null)
 
+        cursor?.let {
+            try{
+                val nameColumn = cursor.getColumnIndexOrThrow(MediaStore.Files.FileColumns.DISPLAY_NAME)
+                val typeColumn = cursor.getColumnIndexOrThrow(MediaStore.Files.FileColumns.MIME_TYPE)
+                cursor.moveToFirst()
+
+                fileInfo = FileInfo(cursor.getString(nameColumn), FileUtils.convertFile(cursor.getString(typeColumn)))
+            } finally {
+                cursor.close()
+            }
+        }
         byteArray = inputStream?.readBytes()!!.clone()
         binding.chatFilePreview.visibility = View.VISIBLE
         binding.chatImagePreviewClose.visibility = View.VISIBLE
@@ -158,7 +175,7 @@ class ChatActivity : AppCompatActivity(), FirestoreGetRoomListener, StorageInter
         }
         else if(binding.chatFilePreview.visibility == View.VISIBLE) {
             binding.chatProgressBar.visibility = View.VISIBLE
-            StorageService.uploadFileToFirebaseStorage(byteArray)
+            StorageService.uploadFileToFirebaseStorage(roomId!!, fileInfo!! ,byteArray)
         }
         else {
             sendMessage(MessageType.TEXT, binding.chatSendMessageText.text.toString())
@@ -275,10 +292,10 @@ class ChatActivity : AppCompatActivity(), FirestoreGetRoomListener, StorageInter
         Log.d(TAG, "onGetMessage Called")
 
         if(message.senderId == Firebase.auth.currentUser!!.uid) {
-            groupieAdapter.add(SendMessageItem(message))
+            groupieAdapter.add(SendMessageItem(message, this))
         }
         else {
-            groupieAdapter.add(ReceiveMessageItem(message))
+            groupieAdapter.add(ReceiveMessageItem(message, this))
         }
         binding.chatRecyclerView.scrollToPosition(groupieAdapter.itemCount-1)
     }
@@ -292,5 +309,10 @@ class ChatActivity : AppCompatActivity(), FirestoreGetRoomListener, StorageInter
         Log.d(TAG, "onFileUploadComplete($filePath) Called")
         sendMessage(MessageType.FILE, filePath)
         binding.chatProgressBar.visibility = View.GONE
+    }
+
+    override fun onFileUriClick(filePath: String) {
+        Log.d(TAG, "onFileUriClick($filePath) Called")
+        StorageService.downloadFileFromFirebaseStorage(filePath)
     }
 }
